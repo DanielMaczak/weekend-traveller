@@ -14,10 +14,10 @@ import bodyParser from 'body-parser';
 import cors, { CorsOptions } from 'cors';
 
 //  Internal dependencies
-import { initSequelize } from './databases/flightData.database.js';
-import { initCronJobs } from './controllers/cronJobs.controller.js';
-import { router } from './router.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { initSequelize } from './databases/flightData.database.ts';
+import { initCronJobs } from './controllers/cronJobs.controller.ts';
+import { router } from './router.ts';
+import { errorHandler } from './middleware/errorHandler.ts';
 
 const SERVER_URL: string = process.env.SERVER_URL;
 const SERVER_PORT: number = process.env.SERVER_PORT;
@@ -33,7 +33,7 @@ const corsOptions: CorsOptions = {
  * Initializes all processes of this webserver app.
  * Is auto-initialized on server start.
  */
-(async () => {
+export const app = (async () => {
   await initSequelize();
   await initCronJobs();
   const app: Application = express();
@@ -46,4 +46,5 @@ const corsOptions: CorsOptions = {
     .listen(SERVER_PORT, SERVER_URL, () => {
       console.log(`Webserver on: ${SERVER_URL}:${SERVER_PORT}`);
     });
+  return app;
 })();

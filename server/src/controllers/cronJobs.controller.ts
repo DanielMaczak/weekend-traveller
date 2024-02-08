@@ -10,8 +10,8 @@
 import { schedule, ScheduledTask } from 'node-cron';
 
 //  Internal dependencies
-import { loadCurrencies, loadAirports } from '../models/cronJobs.model.js';
-import { errorLogger, UnknownError } from '../middleware/errorHandler.js';
+import { loadCurrencies, loadAirports } from '../models/cronJobs.model.ts';
+import { errorLogger, UnknownError } from '../middleware/errorHandler.ts';
 
 //  Cron job schedules
 const FLIGHT_DATA_SCHEDULE = `0 0 12 * * *`;

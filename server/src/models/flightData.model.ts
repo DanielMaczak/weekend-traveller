@@ -9,11 +9,11 @@
  */
 
 //  Internal dependencies
-import { errors } from '../middleware/errorHandler.js';
-import * as api from '../api/skyscanner.api.js';
-import * as libApi from '../libraries/skyscanner.api.js';
-import * as libFd from '../libraries/flightData.model.js';
-import { Airports, Currencies } from '../databases/flightData.database.js';
+import { errors } from '../middleware/errorHandler.ts';
+import * as api from '../api/skyscanner.api.ts';
+import * as libApi from '../libraries/skyscanner.api.ts';
+import * as libFd from '../libraries/flightData.model.ts';
+import { Airports, Currencies } from '../databases/flightData.database.ts';
 
 //  API constants (update if API changes)
 const CABIN_CLASS: string = 'CABIN_CLASS_ECONOMY';
