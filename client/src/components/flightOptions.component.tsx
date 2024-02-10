@@ -159,81 +159,77 @@ function FlightOptions({
 
   return (
     <>
-      <form action="submit" id="flight-options" role="flight-options">
-        {/* Origin selector */}
-        <div className="option-wrapper">
-          <label className="option-label">From:</label>
-          <AsyncPaginate
-            id="flight-options-from"
-            className="option-dropdown"
-            classNamePrefix="option-dropdown"
-            onChange={selected => selected && pickAirport(selected)}
-            loadOptions={loadOptions}
-            required
-          />
-        </div>
-        {/* Start date picker */}
-        <div className="option-wrapper">
-          <label className="option-label">Start date:</label>
-          <DatePicker
-            id="flight-options-start-date"
-            className="option-calendar"
-            selected={startDate}
-            onChange={date => setStartDate(date)}
-            minDate={c.OPTION_START_DATE_DEF}
-            required
-          />
-          <label
-            htmlFor="flight-options-start-date"
-            id="option-label-calendar"
-            className="option-label"
-          >
-            &#119620;
-          </label>
-        </div>
-        {/* Trip length selector */}
-        <div className="option-wrapper">
-          <label className="option-label">Return:</label>
-          <Select
-            id="flight-options-return"
-            className="option-dropdown"
-            classNamePrefix="option-dropdown"
-            defaultValue={c.OPTION_ONE_WAY}
-            onChange={selected => selected && setTripLength(selected)}
-            options={c.OPTIONS_TRIP_LENGTH}
-            required
-          />
-          {tripLength.value !== c.OPTION_ONE_WAY.value ? (
-            <label className="option-label">
-              {tripLength.value === '1' ? 'day' : 'days'}
+      <nav className="flight-options-container">
+        <form action="submit" className="flight-options" role="flight-options">
+          {/* Origin selector */}
+          <div className="flight-option-wrapper">
+            <label className="flight-option-label">From:</label>
+            <AsyncPaginate
+              className="option-dropdown flight-options-from"
+              classNamePrefix="option-dropdown"
+              onChange={selected => selected && pickAirport(selected)}
+              loadOptions={loadOptions}
+              required
+            />
+          </div>
+          {/* Start date picker */}
+          <div className="flight-option-wrapper">
+            <label
+              htmlFor="flight-options-start-date"
+              className="flight-option-label"
+            >
+              Start date:
             </label>
-          ) : (
-            ''
-          )}
-        </div>
-        {/* Weeks to show selector */}
-        <div className="option-wrapper">
-          <label className="option-label">Show:</label>
-          <Select
-            id="flight-options-show-x-weeks"
-            className="option-dropdown"
-            classNamePrefix="option-dropdown"
-            defaultValue={c.OPTION_SHOW_WEEKS_DEF}
-            onChange={selected => selected && setShowWeeks(selected)}
-            options={c.OPTIONS_SHOW_WEEKS}
-            required
-          />
-          <label className="option-label">weeks</label>
-        </div>
-        {/* Search button */}
-        <button
-          id="flight-options-search"
-          className="option-button"
-          onClick={e => searchFlights(e)}
-        >
-          &#x1F50E;&#xFE0E;
-        </button>
-      </form>
+            <DatePicker
+              id="flight-options-start-date"
+              className="option-calendar flight-options-start-date"
+              selected={startDate}
+              onChange={date => setStartDate(date)}
+              minDate={c.OPTION_START_DATE_DEF}
+              required
+            />
+          </div>
+          {/* Trip length selector */}
+          <div className="flight-option-wrapper">
+            <label className="flight-option-label">Return:</label>
+            <Select
+              className="option-dropdown"
+              classNamePrefix="option-dropdown"
+              defaultValue={c.OPTION_ONE_WAY}
+              onChange={selected => selected && setTripLength(selected)}
+              options={c.OPTIONS_TRIP_LENGTH}
+              required
+            />
+            {tripLength.value !== c.OPTION_ONE_WAY.value ? (
+              <label className="flight-option-label">
+                {tripLength.value === '1' ? 'day' : 'days'}
+              </label>
+            ) : (
+              ''
+            )}
+          </div>
+          {/* Weeks to show selector */}
+          <div className="flight-option-wrapper">
+            <label className="flight-option-label">Show:</label>
+            <Select
+              className="option-dropdown"
+              classNamePrefix="option-dropdown"
+              defaultValue={c.OPTION_SHOW_WEEKS_DEF}
+              onChange={selected => selected && setShowWeeks(selected)}
+              options={c.OPTIONS_SHOW_WEEKS}
+              required
+            />
+            <label className="flight-option-label">weeks</label>
+          </div>
+          {/* Search button */}
+          <button
+            className="flight-options-search"
+            onClick={e => searchFlights(e)}
+          >
+            &#x1F50E;&#xFE0E;
+          </button>
+        </form>
+      </nav>
     </>
   );
 }

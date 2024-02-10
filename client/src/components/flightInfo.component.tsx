@@ -11,6 +11,7 @@ import {
   getAirports,
   postFlightInfoRequest,
 } from '../services/flightData.service';
+import FlightDetail from './flightDetail.component';
 
 /**
  * @module
@@ -75,16 +76,14 @@ function FlightInfo({
     });
   };
 
-  // console.log(flightData);
-
   return (
     <>
       {destination ? (
-        <li className="cheap-flight" onClick={getFlightDetail}>
-          <div>{destination.label}</div>
-          <div className="cheap-flight-info">
+        <li className="flight-tile" onClick={getFlightDetail}>
+          <div className="flight-tile-header">{destination.label}</div>
+          <div className="flight-tile-info">
             {/* Vendor pictures */}
-            <div className="cheap-flight-info-vendors">
+            <div className="flight-tile-info-vendors">
               <img src={flightInfo.vendorTherePic} alt="" />
               {flightInfo.vendorBackPic ? (
                 <img src={flightInfo.vendorBackPic} alt="" />
@@ -93,11 +92,12 @@ function FlightInfo({
               )}
             </div>
             {/* Transfer / Price */}
-            <div className="cheap-flight-more-info">
+            <div className="flight-tile-price-transfer">
               {flightInfo.hasTransfers && (
-                <span className="transfer">Transfer</span>
+                <span className="flight-tile-transfer">Transfer</span>
               )}
-              <span className="price">
+              <span className="flight-tile-price">
+                ~{' '}
                 {flightInfo.price.toLocaleString(requestBody.localeCode, {
                   style: 'currency',
                   currency: requestBody.currencyCode,
@@ -105,7 +105,11 @@ function FlightInfo({
               </span>
             </div>
           </div>
-          <div className="cheap-flight-detail"></div>
+          {flightData ? (
+            <FlightDetail flightData={flightData} requestBody={requestBody} />
+          ) : (
+            ''
+          )}
         </li>
       ) : (
         ''

@@ -5,8 +5,6 @@ body,
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  line-height: 1.5;
-  color: #35312e;
 }
 
 input,
@@ -20,6 +18,10 @@ option {
   font-weight: inherit;
 }
 
+li {
+  list-style-type: none;
+}
+
 *,
 *:focus,
 *:focus-visible,
@@ -29,30 +31,4 @@ option {
 *:hover,
 *:visited {
   outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Global settings */
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: 500;
-  background-color: #f7eadf;
-}
-
-li {
-  list-style-type: none;
-}
-
-::-webkit-scrollbar {
-  width: auto;
-}
-::-webkit-scrollbar-track {
-  background: rgba(238, 211, 204, 0.5);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.5);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.8);
 }

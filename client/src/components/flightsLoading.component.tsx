@@ -9,8 +9,20 @@
 function FlightsLoading() {
   return (
     <>
-      <div className="loading-container">
-        <span className="loading">We are loading your weekend travels...</span>
+      <div className="flights-loading-container">
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading-airplane">✈</span>
+        <span className="flights-loading">
+          We are loading your weekend travels...
+        </span>
       </div>
     </>
   );

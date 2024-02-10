@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 //  Internal dependencies
 import FlightsOverview from './flightsOverview';
 import FlightOptions from './flightOptions.component';
-import FlightsMakeSelection from './flightsMakeSelection.component';
+import Home from './home.component';
 import * as libFd from '../libraries/flightData.service';
 import { postCheapestFlightsRequest } from '../services/flightData.service';
 import FlightsLoading from './flightsLoading.component';
@@ -47,21 +47,25 @@ function FlightsDashboard() {
   return (
     <>
       <FlightOptions composeRequest={composeRequest} />
-      <main id="dashboard" role="main">
-        {cheapFlights && requestBody ? (
-          // Request made and fulfilled
+      {cheapFlights && requestBody ? (
+        // Request made and fulfilled
+        <main role="main" style={{ flexGrow: 100 }}>
           <FlightsOverview
             cheapFlights={cheapFlights}
             requestBody={requestBody}
           />
-        ) : !cheapFlights && requestBody ? (
-          // Request made but not yet fulfilled
+        </main>
+      ) : !cheapFlights && requestBody ? (
+        // Request made but not yet fulfilled
+        <main role="main" style={{ flexGrow: 100 }}>
           <FlightsLoading />
-        ) : (
-          // No request
-          <FlightsMakeSelection />
-        )}
-      </main>
+        </main>
+      ) : (
+        // No request
+        <main role="main" style={{ flexGrow: 1 }}>
+          <Home />
+        </main>
+      )}
     </>
   );
 }

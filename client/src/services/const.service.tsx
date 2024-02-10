@@ -18,6 +18,11 @@ export const SERVER_URL: string = `http://localhost:3000`;
 export const IP_REQUEST_URL: string = `https://api.ipify.org?format=json`;
 
 /**
+ * @constant ID_OPTIONS_FROM airport selection dropdown
+ */
+export const ID_OPTIONS_FROM: string = 'flight-options-from';
+
+/**
  * Request options
  * @constant GLOBAL_LOCALE decided to ignore user's locale due to time constraint
  * @constant OPTIONS_SHOW_WEEKS weeks to display, value MUST be a number

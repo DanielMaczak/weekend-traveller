@@ -55,14 +55,12 @@ function App() {
   return (
     <>
       <LocaleContext.Provider value={localeInfo}>
-        <div id="app">
-          <Header
-            selectedCurrency={selectedCurrency}
-            selectCurrency={selectCurrency}
-          />
-          <FlightsDashboard />
-          <Footer />
-        </div>
+        <Header
+          selectedCurrency={selectedCurrency}
+          selectCurrency={selectCurrency}
+        />
+        <FlightsDashboard />
+        <Footer />
       </LocaleContext.Provider>
     </>
   );

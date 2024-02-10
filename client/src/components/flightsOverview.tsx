@@ -45,38 +45,40 @@ function FlightsOverview({
   return (
     <>
       {/* Date headers */}
-      <ul className="day-overview-columns">
-        {Object.keys(cheapFlights).map((dayKey, i) => (
-          <li key={`header.${dayKey}`} className="flights-day-header">
-            <h3>
-              {/* Show flight date */}
-              {moment(getTravelDate(i)).format('DD MMM YYYY')}
-              {/* Show return date if not one way */}
-              {requestBody.returnDate
-                ? ' / ' + moment(getReturnDate(i)).format('DD MMM YYYY')
-                : ''}
-            </h3>
-          </li>
-        ))}
-      </ul>
-      {/* Flight tiles */}
-      <ul className="flights-overview-columns">
-        {Object.keys(cheapFlights).map((dayKey, i) => (
-          <ul key={`list.${dayKey}`} className="flights-day-list">
-            {cheapFlights[dayKey].map(flight => (
-              <FlightInfo
-                key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}
-                flightInfo={flight}
-                requestBody={requestBody}
-                flightDate={getTravelDate(i)}
-                returnDate={
-                  requestBody.returnDate ? getReturnDate(i) : undefined
-                }
-              />
-            ))}
-          </ul>
-        ))}
-      </ul>
+      <div className="flights-overview">
+        <ul className="flights-overview-headers">
+          {Object.keys(cheapFlights).map((dayKey, i) => (
+            <li key={`header.${dayKey}`} className="flights-overview-header">
+              <h3>
+                {/* Show flight date */}
+                {moment(getTravelDate(i)).format('DD MMM YYYY')}
+                {/* Show return date if not one way */}
+                {requestBody.returnDate
+                  ? ' / ' + moment(getReturnDate(i)).format('DD MMM YYYY')
+                  : ''}
+              </h3>
+            </li>
+          ))}
+        </ul>
+        {/* Flight tiles */}
+        <ul className="flights-overview-tiles">
+          {Object.keys(cheapFlights).map((dayKey, i) => (
+            <ul key={`list.${dayKey}`} className="flights-overview-tile-column">
+              {cheapFlights[dayKey].map(flight => (
+                <FlightInfo
+                  key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}
+                  flightInfo={flight}
+                  requestBody={requestBody}
+                  flightDate={getTravelDate(i)}
+                  returnDate={
+                    requestBody.returnDate ? getReturnDate(i) : undefined
+                  }
+                />
+              ))}
+            </ul>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

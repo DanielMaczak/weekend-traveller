@@ -46,21 +46,20 @@ function Header({
 
   return (
     <>
-      <header id="header" role="header">
+      <header role="header">
         {/* Locale form */}
-        <form action="submit" id="locale-options" role="locale-options">
+        <form action="submit" className="locale-options" role="locale-options">
           {/* Market selector # Disabled */}
-          <div className="option-wrapper-disabled">
-            <label className="option-label">Your location:</label>
+          <div className="flight-option-wrapper-disabled">
+            <label className="flight-option-label">Your location:</label>
             <span className="option-value">
               {useContext(LocaleContext).locationName}
             </span>
           </div>
           {/* Currency selector */}
-          <div className="option-wrapper">
-            <label className="option-label">Currency:</label>
+          <div className="flight-option-wrapper">
+            <label className="flight-option-label">Currency:</label>
             <Select
-              id="flight-options-currency"
               className="option-dropdown"
               classNamePrefix="option-dropdown"
               value={{
@@ -73,7 +72,7 @@ function Header({
           </div>
         </form>
         {/* Site logo */}
-        <div id="header-logo" role="logo">
+        <div className="header-logo" role="logo">
           <h1>Weekend Traveller</h1>
         </div>
       </header>
