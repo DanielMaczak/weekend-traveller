@@ -58,6 +58,7 @@ header {
   position: relative;
   flex: auto;
   justify-content: flex-end;
+  z-index: 3;
 }
 .header-logo {
   display: flex;
@@ -68,7 +69,6 @@ header {
   right: 0;
   justify-content: center;
   align-items: end;
-  z-index: 1;
 }
 .header-logo h1 {
   color: var(--color-magenta);
@@ -85,7 +85,6 @@ header {
   align-items: flex-end;
   justify-content: flex-start;
   gap: var(--padding-gap);
-  z-index: 2;
 }
 
 /* Flight options */
@@ -148,13 +147,12 @@ main {
   display: flex;
   margin: auto;
   align-items: flex-start;
-  transition: flex-grow 0.5s ease-in-out;
+  transition: flex-grow 1s ease-in-out;
 }
 
 /* Home */
 
 .welcome-container {
-  cursor: pointer;
   max-width: var(--max-width);
   width: 100%;
   height: 100%;
@@ -176,6 +174,7 @@ main {
   text-shadow: var(--shadow-offset) var(--shadow-offset) var(--color-white);
 }
 .welcome-textline {
+  position: relative;
   flex: 1;
   background-color: var(--color-white);
   font-size: 1.3rem;

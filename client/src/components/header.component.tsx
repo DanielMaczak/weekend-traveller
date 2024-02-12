@@ -47,6 +47,10 @@ function Header({
   return (
     <>
       <header role="header">
+        {/* Site logo */}
+        <div className="header-logo" role="logo">
+          <h1>Weekend Traveller</h1>
+        </div>
         {/* Locale form */}
         <form action="submit" className="locale-options" role="locale-options">
           {/* Market selector # Disabled */}
@@ -71,10 +75,6 @@ function Header({
             />
           </div>
         </form>
-        {/* Site logo */}
-        <div className="header-logo" role="logo">
-          <h1>Weekend Traveller</h1>
-        </div>
       </header>
     </>
   );

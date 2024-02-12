@@ -13,6 +13,11 @@ import * as libFd from '../libraries/flightData.service';
 import { postCheapestFlightsRequest } from '../services/flightData.service';
 import FlightsLoading from './flightsLoading.component';
 
+function sleep(ms?: number) {
+  return new Promise(resolve =>
+    setTimeout(resolve, ms ? Math.max(0, ms) : 500)
+  );
+}
 /**
  * @module
  * Section dedicated to searching flights.
@@ -26,46 +31,136 @@ function FlightsDashboard() {
   const [requestBody, composeRequest] =
     useState<libFd.CheapestFlightsRequest>();
 
+  const [homeVisible, showHome] = useState(false);
+  const [loadingVisible, showLoading] = useState(false);
+  const [flightsVisible, showFlights] = useState(false);
+
+  const [dashboard, changeDashboard] = useState<JSX.Element>();
+
   //  Data load hooks
   useEffect(() => {
-    if (requestBody) {
-      getCheapFlights(undefined); // trigger loading page
-      postCheapestFlightsRequest(requestBody).then(data => {
-        if (!data) {
-          alert(
-            `We couldn't load the flight information. ` +
-              `Please try again later.`
+    showHome(true);
+  }, []);
+  useEffect(() => {
+    changeDashboard(
+      <Home
+        homeVisible={homeVisible}
+        nextStep={() => {
+          showLoading(true);
+          changeDashboard(
+            <FlightsLoading
+              loadingVisible={loadingVisible}
+              nextStep={showFlights}
+            />
           );
-          composeRequest(undefined);
-          return;
-        }
-        getCheapFlights(data);
-      });
+        }}
+      />
+    );
+  }, [homeVisible]);
+
+  useEffect(() => {
+    showFlights(false);
+    if (requestBody) {
+      showHome(false);
     }
   }, [requestBody]);
+
+  useEffect(() => {
+    if (requestBody) {
+      if (loadingVisible) {
+        changeDashboard(
+          <FlightsLoading loadingVisible={loadingVisible} nextStep={() => {}} />
+        );
+        getCheapFlights(undefined);
+        postCheapestFlightsRequest(requestBody).then(data => {
+          if (!data) {
+            alert(
+              `We couldn't load the flight information. ` +
+                `Please try again later.`
+            );
+            composeRequest(undefined);
+            return;
+          }
+          sleep(2000).then(() => {
+            getCheapFlights(data);
+          });
+        });
+      } else {
+        // changeDashboard(
+        //   <FlightsOverview
+        //     cheapFlights={cheapFlights}
+        //     requestBody={requestBody}
+        //     flightsVisible={flightsVisible}
+        //     nextStep={showLoading}
+        //   />
+        // );
+        // showFlights(true);
+        changeDashboard(
+          <FlightsLoading
+            loadingVisible={loadingVisible}
+            nextStep={() => {
+              console.log('next step2');
+              changeDashboard(
+                <FlightsOverview
+                  cheapFlights={cheapFlights}
+                  requestBody={requestBody}
+                  flightsVisible={flightsVisible}
+                  nextStep={showLoading}
+                />
+              );
+              showFlights(true);
+            }}
+          />
+        );
+      }
+    }
+  }, [loadingVisible]);
+
+  useEffect(() => {
+    if (cheapFlights && requestBody) {
+      showLoading(false);
+    }
+  }, [cheapFlights, flightsVisible]);
+
+  // useEffect(() => {
+  //   if (flightsVisible && cheapFlights && requestBody) {
+  //   }
+  // }, [flightsVisible]);
+
+  useEffect(() => {
+    if (cheapFlights && requestBody) {
+      changeDashboard(
+        <FlightsOverview
+          cheapFlights={cheapFlights}
+          requestBody={requestBody}
+          flightsVisible={flightsVisible}
+          nextStep={showLoading}
+        />
+      );
+    }
+  }, [flightsVisible]);
+
+  console.log('refresh');
 
   return (
     <>
       <FlightOptions composeRequest={composeRequest} />
-      {cheapFlights && requestBody ? (
-        // Request made and fulfilled
-        <main role="main" style={{ flexGrow: 100 }}>
+      <main role="main" style={{ flexGrow: homeVisible ? 1 : 20 }}>
+        {dashboard}
+        {/* {cheapFlights && requestBody ? (
+          // Request made and fulfilled
           <FlightsOverview
             cheapFlights={cheapFlights}
             requestBody={requestBody}
           />
-        </main>
-      ) : !cheapFlights && requestBody ? (
-        // Request made but not yet fulfilled
-        <main role="main" style={{ flexGrow: 100 }}>
+        ) : !cheapFlights && requestBody ? (
+          // Request made but not yet fulfilled
           <FlightsLoading />
-        </main>
-      ) : (
-        // No request
-        <main role="main" style={{ flexGrow: 1 }}>
-          <Home />
-        </main>
-      )}
+        ) : (
+          // No request
+          <Home homeVisible={homeVisible} />
+        )} */}
+      </main>
     </>
   );
 }
