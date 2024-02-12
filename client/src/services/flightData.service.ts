@@ -124,6 +124,17 @@ export const postCheapestFlightsRequest = async (
     if (!response.ok) throw new Error(response.statusText);
     const data: libFd.CheapestFlights = await response.json();
 
+    //  Filter cheapest option to each location
+    for (let [key, value] of Object.entries(data)) {
+      data[key] = value.filter(
+        filterEl =>
+          filterEl ===
+          value.find(
+            findEl => findEl.destinationPlaceId === filterEl.destinationPlaceId
+          )
+      );
+    }
+
     //  Update cache
     cheapestFlightsCache[requestJSON] = data;
     return data;
