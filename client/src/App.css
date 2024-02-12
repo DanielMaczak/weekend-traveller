@@ -387,6 +387,7 @@ main {
   flex-wrap: wrap;
   flex-direction: column;
   cursor: pointer;
+  overflow: hidden;
   background: var(--color-white);
   border: var(--border-size) solid var(--color-white);
   border-radius: var(--border-radius);

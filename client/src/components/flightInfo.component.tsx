@@ -3,7 +3,7 @@
  */
 
 //  External dependencies
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 //  Internal dependencies
 import * as libFd from '../libraries/flightData.service';
@@ -12,6 +12,24 @@ import {
   postFlightInfoRequest,
 } from '../services/flightData.service';
 import FlightDetail from './flightDetail.component';
+
+//  External dependencies
+import { useRef } from 'react';
+import { Transition } from 'react-transition-group';
+
+const duration = 500;
+
+const defaultStyle = {
+  transition: `${duration}ms ease-in-out`,
+  maxHeight: 0,
+};
+
+const transitionStyles: { [key: string]: {} } = {
+  entering: { maxHeight: 0 },
+  entered: { maxHeight: '1000px' },
+  exiting: { maxHeight: 0 },
+  exited: { maxHeight: 0 },
+};
 
 /**
  * @module
@@ -36,8 +54,13 @@ function FlightInfo({
   returnDate: number | undefined;
 }) {
   //  State hooks
+  const nodeRef = useRef(null);
+
+  //  State hooks
   const [flightData, setFlightData] = useState<libFd.FlightInfo>();
   const [destination, setDestination] = useState<libFd.Option>();
+
+  const [detailsVisible, showDetails] = useState(false);
 
   //  Data load hooks
   useEffect(() => {
@@ -56,6 +79,8 @@ function FlightInfo({
    * Uses input for flight list search so no validation needed.
    */
   const getFlightDetail = () => {
+    showDetails(!detailsVisible);
+    if (flightData) return;
     const flightInfoRequest: libFd.FlightInfoRequest = {
       currencyCode: requestBody.currencyCode,
       localeCode: requestBody.localeCode,
@@ -70,6 +95,7 @@ function FlightInfo({
     postFlightInfoRequest(flightInfoRequest).then(data => {
       if (!data) {
         alert(`Couldn't load data for this flight. Please try again later.`);
+        if (detailsVisible) showDetails(!detailsVisible);
         return;
       }
       setFlightData(data);
@@ -105,11 +131,24 @@ function FlightInfo({
               </span>
             </div>
           </div>
-          {flightData ? (
-            <FlightDetail flightData={flightData} requestBody={requestBody} />
-          ) : (
-            ''
-          )}
+
+          <Transition nodeRef={nodeRef} in={detailsVisible} timeout={duration}>
+            {(state: string) => (
+              <div
+                ref={nodeRef}
+                className="flight-tile-detail"
+                style={{
+                  ...defaultStyle,
+                  ...transitionStyles[state],
+                }}
+              >
+                <FlightDetail
+                  flightData={flightData}
+                  requestBody={requestBody}
+                />
+              </div>
+            )}
+          </Transition>
         </li>
       ) : (
         ''

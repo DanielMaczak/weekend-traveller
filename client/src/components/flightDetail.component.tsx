@@ -18,66 +18,78 @@ function FlightDetail({
   flightData,
   requestBody,
 }: {
-  flightData: libFd.FlightInfo;
+  flightData: libFd.FlightInfo | undefined;
   requestBody: libFd.CheapestFlightsRequest;
 }) {
   const [flightInfo, setFlightInfo] = useState<FlightInfoProcessed>();
 
   useEffect(() => {
-    let flightDataProcessed: FlightInfoProcessed = {
-      segments: [],
-      vendorLink: flightData.vendorLink,
-      price: flightData.price.toLocaleString(requestBody.localeCode, {
-        style: 'currency',
-        currency: requestBody.currencyCode,
-      }),
-    };
+    if (flightData) {
+      let flightDataProcessed: FlightInfoProcessed = {
+        segments: [],
+        vendorLink: flightData.vendorLink,
+        price: flightData.price.toLocaleString(requestBody.localeCode, {
+          style: 'currency',
+          currency: requestBody.currencyCode,
+        }),
+      };
 
-    getAirports().then(airports => {
-      if (!airports) return; // already checked in flight options
-      flightData.segments.forEach(segment => {
-        flightDataProcessed.segments.push({
-          originAirport:
-            airports.find(airport => airport.value === segment.originPlaceId)
-              ?.label ?? 'Unknown airport',
-          destinationAirport:
-            airports.find(
-              airport => airport.value === segment.destinationPlaceId
-            )?.label ?? 'Unknown airport',
-          departure: moment(segment.departure).format('HH:mm'),
-          arrival: moment(segment.arrival).format('HH:mm'),
+      getAirports().then(airports => {
+        if (!airports) return; // already checked in flight options
+        flightData.segments.forEach(segment => {
+          flightDataProcessed.segments.push({
+            originAirport:
+              airports.find(airport => airport.value === segment.originPlaceId)
+                ?.label ?? 'Unknown airport',
+            destinationAirport:
+              airports.find(
+                airport => airport.value === segment.destinationPlaceId
+              )?.label ?? 'Unknown airport',
+            departure: moment(segment.departure).format('HH:mm'),
+            arrival: moment(segment.arrival).format('HH:mm'),
+          });
         });
+        setFlightInfo(flightDataProcessed);
       });
-      setFlightInfo(flightDataProcessed);
-    });
-  }, []);
+    }
+  }, [flightData]);
 
   return (
     <>
-      {flightInfo?.segments.map(segment => (
+      {flightInfo ? (
+        <>
+          {flightInfo?.segments.map(segment => (
+            <div className="flight-tile-segment">
+              <p className="flight-tile-segment-info">
+                <span className="flight-tile-segment-airport">
+                  {segment.originAirport}
+                </span>
+                <span className="flight-tile-segment-time">
+                  {segment.departure}
+                </span>
+              </p>
+              <p className="flight-tile-segment-info">
+                <span className="flight-tile-segment-airport">
+                  {segment.destinationAirport}
+                </span>
+                <span className="flight-tile-segment-time">
+                  {segment.arrival}
+                </span>
+              </p>
+            </div>
+          ))}
+          <a target="_blank" rel="noreferrer" href={flightInfo?.vendorLink}>
+            <div className="flight-tile-final-price">
+              <span>Exact price:</span>
+              <span>{flightInfo?.price}</span>
+            </div>
+          </a>
+        </>
+      ) : (
         <div className="flight-tile-segment">
-          <p className="flight-tile-segment-info">
-            <span className="flight-tile-segment-airport">
-              {segment.originAirport}
-            </span>
-            <span className="flight-tile-segment-time">
-              {segment.departure}
-            </span>
-          </p>
-          <p className="flight-tile-segment-info">
-            <span className="flight-tile-segment-airport">
-              {segment.destinationAirport}
-            </span>
-            <span className="flight-tile-segment-time">{segment.arrival}</span>
-          </p>
+          <center>Loading details...</center>
         </div>
-      ))}
-      <a href={flightInfo?.vendorLink}>
-        <div className="flight-tile-final-price">
-          <span>Exact price:</span>
-          <span>{flightInfo?.price}</span>
-        </div>
-      </a>
+      )}
     </>
   );
 }
