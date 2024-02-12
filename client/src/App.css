@@ -27,6 +27,7 @@ body {
 /* App */
 
 body {
+  overflow-y: scroll;
   background-image: url('src/assets/pexels-aleksandar-pasaric-1285625-2.jpg');
   background-position: top;
   background-repeat: no-repeat;
@@ -300,19 +301,29 @@ main {
 
 /* Flights dashboard */
 
+.flights-overview-container {
+  width: 100%;
+  padding: 0 0 0 1rem;
+}
 .flights-overview {
   display: flex;
   margin: 1rem auto;
-  padding: 0 0 var(--padding-gap) var(--padding-gap);
+  padding: 0 0 var(--padding-gap) calc(1rem + var(--padding-gap));
   flex: 100;
   flex-direction: column;
+  contain: layout paint;
   background: var(--color-gray-shadow);
   border: var(--border-size) solid var(--color-white);
   border-radius: 0.8rem;
 }
+.flights-overview-overflow-container {
+  position: relative;
+  left: 0;
+  transition: var(--transform-len);
+}
 .flights-overview-headers {
   position: sticky;
-  top: 3rem;
+  top: 2.8rem;
 }
 .flights-overview-headers,
 .flights-overview-tiles {
@@ -344,6 +355,29 @@ main {
   display: flex;
   gap: calc(2 * var(--shadow-offset));
   flex-direction: column;
+}
+.flights-overview-arrow {
+  cursor: pointer;
+  position: fixed;
+  padding: 0.3rem 0.7rem 0.4rem 0.8rem;
+  background-color: var(--color-gray-text);
+  color: var(--color-white);
+  border-radius: var(--border-radius);
+  z-index: 200;
+  transition: var(--transform-len);
+}
+.arrow-left {
+  margin: 10rem -1.2rem;
+  transform: scale(-1, 1);
+  box-shadow: calc(-1 * var(--shadow-offset)) var(--shadow-offset)
+    var(--color-white);
+}
+.arrow-right {
+  margin: 14rem -1.2rem;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) var(--color-white);
+}
+.flights-overview-arrow > div {
+  transform: scale(1, 1.5);
 }
 
 /* Flight tile */
@@ -474,6 +508,9 @@ footer {
 .flight-options-search:hover {
   background: var(--color-gold);
   transition: 0s;
+}
+.flights-overview-arrow:hover {
+  background: var(--color-magenta);
 }
 .flight-tile:hover {
   border: var(--border-size) solid var(--color-gold);

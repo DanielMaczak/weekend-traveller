@@ -61,15 +61,34 @@ function FlightsOverview({
   //  State hooks
   const nodeRef = useRef(null);
 
+  const columns: number = 4;
+
   //  Provide easy access to travel dates based on table column.
   const getTravelDate = (addWeeks: number): number =>
     getDateOffset(requestBody.travelDate, addWeeks);
   const getReturnDate = (addWeeks: number): number =>
     getDateOffset(requestBody.returnDate ?? 0, addWeeks);
 
+  const moveFlightsOverview = (applyOffset: number) => {
+    if (requestBody.lookAtWeeks <= columns) return;
+    applyOffset = Math.min(1, Math.max(-1, applyOffset)) / columns;
+    const overflowContainer: HTMLElement | null = document.getElementById(
+      'flights-overview-overflow-container'
+    );
+    if (!overflowContainer) return;
+    const minOffset: number = -(requestBody.lookAtWeeks - columns) / columns;
+    const maxOffset: number = 0;
+    let currentOffset: number =
+      parseFloat(overflowContainer.style.left || '0') / 100;
+    let newOffset: number = Math.min(
+      maxOffset,
+      Math.max(minOffset, currentOffset + applyOffset)
+    );
+    overflowContainer.style.left = newOffset * 100 + '%';
+  };
+
   return (
     <>
-      {/* Date headers */}
       <Transition
         nodeRef={nodeRef}
         in={flightsVisible}
@@ -79,59 +98,82 @@ function FlightsOverview({
         {(state: string) => (
           <div
             ref={nodeRef}
-            className="flights-overview"
+            className="flights-overview-container"
             style={{
               ...defaultStyle,
               ...transitionStyles[state],
             }}
           >
-            <ul className="flights-overview-headers">
-              {Object.keys(cheapFlights).map((dayKey, i) => (
-                <li
-                  key={`header.${dayKey}`}
-                  className="flights-overview-header"
-                >
-                  <h3>
-                    {/* Show flight date */}
-                    {moment(getTravelDate(i)).format('DD MMM YYYY')}
-                    {/* Show return date if not one way */}
-                    {requestBody.returnDate
-                      ? ' / ' + moment(getReturnDate(i)).format('DD MMM YYYY')
-                      : ''}
-                  </h3>
-                </li>
-              ))}
-            </ul>
-            {/* Flight tiles */}
-            <ul className="flights-overview-tiles">
-              {Object.keys(cheapFlights).map((dayKey, i) => (
-                <ul
-                  key={`list.${dayKey}`}
-                  className="flights-overview-tile-column"
-                >
-                  {cheapFlights[dayKey].map((flight, j) => (
-                    <div
-                      key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}
-                      ref={nodeRef}
-                      style={{
-                        ...defaultStyle,
-                        transitionDelay: j * 0.1 + 's',
-                        ...transitionStyles[state],
-                      }}
+            <button
+              className="flights-overview-arrow arrow-left"
+              onClick={() => moveFlightsOverview(1)}
+            >
+              <div>➤</div>
+            </button>
+            <button
+              className="flights-overview-arrow arrow-right"
+              onClick={() => moveFlightsOverview(-1)}
+            >
+              <div>➤</div>
+            </button>
+            <div className="flights-overview">
+              <div
+                id="flights-overview-overflow-container"
+                className="flights-overview-overflow-container"
+              >
+                {/* Date headers */}
+                <ul className="flights-overview-headers">
+                  {Object.keys(cheapFlights).map((dayKey, i) => (
+                    <li
+                      key={`header.${dayKey}`}
+                      className="flights-overview-header"
                     >
-                      <FlightInfo
-                        flightInfo={flight}
-                        requestBody={requestBody}
-                        flightDate={getTravelDate(i)}
-                        returnDate={
-                          requestBody.returnDate ? getReturnDate(i) : undefined
-                        }
-                      />
-                    </div>
+                      <h3>
+                        {/* Show flight date */}
+                        {moment(getTravelDate(i)).format('DD MMM YYYY')}
+                        {/* Show return date if not one way */}
+                        {requestBody.returnDate
+                          ? ' / ' +
+                            moment(getReturnDate(i)).format('DD MMM YYYY')
+                          : ''}
+                      </h3>
+                    </li>
                   ))}
                 </ul>
-              ))}
-            </ul>
+                {/* Flight tiles */}
+                <ul className="flights-overview-tiles">
+                  {Object.keys(cheapFlights).map((dayKey, i) => (
+                    <ul
+                      key={`list.${dayKey}`}
+                      className="flights-overview-tile-column"
+                    >
+                      {cheapFlights[dayKey].map((flight, j) => (
+                        <div
+                          key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}
+                          ref={nodeRef}
+                          style={{
+                            ...defaultStyle,
+                            transitionDelay: j * 0.1 + 's',
+                            ...transitionStyles[state],
+                          }}
+                        >
+                          <FlightInfo
+                            flightInfo={flight}
+                            requestBody={requestBody}
+                            flightDate={getTravelDate(i)}
+                            returnDate={
+                              requestBody.returnDate
+                                ? getReturnDate(i)
+                                : undefined
+                            }
+                          />
+                        </div>
+                      ))}
+                    </ul>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </Transition>
