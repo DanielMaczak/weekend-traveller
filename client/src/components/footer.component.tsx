@@ -3,6 +3,9 @@
  * @version 1.1.0 Remove creator footer entry
  */
 
+//  Internal dependencies
+import skyscannerLogo from '../../assets/inline--black.svg';
+
 /**
  * @module
  * Bottom part of page.
@@ -16,7 +19,7 @@ function Footer() {
           {/* API credit # mandatory */}
           <div className="footer-note">
             <a href="http://www.skyscanner.net/">
-              <img src="src/assets/inline--black.svg"></img>
+              <img src={skyscannerLogo}></img>
             </a>
           </div>
           {/* Background image credit # mandatory */}

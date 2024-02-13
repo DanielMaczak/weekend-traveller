@@ -28,7 +28,7 @@ body {
 
 body {
   overflow-y: scroll;
-  background-image: url('src/assets/pexels-aleksandar-pasaric-1285625-2.jpg');
+  background-image: url('/assets/pexels-aleksandar-pasaric-1285625-2.jpg');
   background-position: top;
   background-repeat: no-repeat;
   background-size: cover;
