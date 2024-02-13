@@ -14,10 +14,10 @@ import bodyParser from 'body-parser';
 import cors, { CorsOptions } from 'cors';
 
 //  Internal dependencies
-import { initSequelize } from './databases/flightData.database.ts';
-import { initCronJobs } from './controllers/cronJobs.controller.ts';
-import { router } from './router.ts';
-import { errorHandler } from './middleware/errorHandler.ts';
+import { initSequelize } from './databases/flightData.database.js';
+import { initCronJobs } from './controllers/cronJobs.controller.js';
+import { router } from './router.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const SERVER_URL: string = process.env.SERVER_URL;
 const SERVER_PORT: number = process.env.SERVER_PORT;

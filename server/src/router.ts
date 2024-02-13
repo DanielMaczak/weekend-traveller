@@ -11,8 +11,8 @@
 import express, { Request, Response, Router } from 'express';
 
 //  Internal dependencies
-import { errors, errorCatcher } from './middleware/errorHandler.ts';
-import * as flightData from './controllers/flightData.controller.ts';
+import { errors, errorCatcher } from './middleware/errorHandler.js';
+import * as flightData from './controllers/flightData.controller.js';
 
 export const router: Router = express.Router();
 

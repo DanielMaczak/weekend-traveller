@@ -11,11 +11,9 @@
     "module": "NodeNext",
     "rootDir": ".",
     "rootDirs": ["src"],
-    "allowImportingTsExtensions": true,
 
     /* Emit */
     "outDir": "./dist",
-    "noEmit": true,
 
     /* Interop Constraints */
     "esModuleInterop": true,

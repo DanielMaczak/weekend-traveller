@@ -10,10 +10,10 @@
 import { Optional } from 'sequelize';
 
 //  Internal dependencies
-import { errors } from '../middleware/errorHandler.ts';
-import * as api from '../api/skyscanner.api.ts';
-import * as libApi from '../libraries/skyscanner.api.ts';
-import { Airports, Currencies } from '../databases/flightData.database.ts';
+import { errors } from '../middleware/errorHandler.js';
+import * as api from '../api/skyscanner.api.js';
+import * as libApi from '../libraries/skyscanner.api.js';
+import { Airports, Currencies } from '../databases/flightData.database.js';
 
 //  API constants (update if API changes)
 const PLACE_TYPE_COUNTRY = 'PLACE_TYPE_COUNTRY';

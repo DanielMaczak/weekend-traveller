@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import request from 'supertest';
 
-import { app } from '../index.ts';
+import { app } from '../index.js';
 
 beforeAll(done => {
   done();
