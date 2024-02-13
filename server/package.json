@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "weekend-traveller-server",
   "version": "1.0.0",
   "description": "Webserver providing back-end functionality for the flight search website Weekend traveller.",
@@ -9,7 +10,6 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
   },
-  "type": "module",
   "author": "Daniel Maczak",
   "license": "MIT",
   "dependencies": {
