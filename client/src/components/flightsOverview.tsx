@@ -61,7 +61,9 @@ function FlightsOverview({
   //  State hooks
   const nodeRef = useRef(null);
 
-  const columns: number = 4;
+  const screenWidth: number =
+    document.body.clientWidth * window.devicePixelRatio;
+  const columns: number = screenWidth <= 576 ? 1 : screenWidth <= 996 ? 2 : 4;
 
   //  Provide easy access to travel dates based on table column.
   const getTravelDate = (addWeeks: number): number =>
@@ -70,6 +72,8 @@ function FlightsOverview({
     getDateOffset(requestBody.returnDate ?? 0, addWeeks);
 
   const moveFlightsOverview = (applyOffset: number) => {
+    console.log(screenWidth, columns);
+
     if (requestBody.lookAtWeeks <= columns) return;
     applyOffset = Math.min(1, Math.max(-1, applyOffset)) / columns;
     const overflowContainer: HTMLElement | null = document.getElementById(
@@ -147,6 +151,11 @@ function FlightsOverview({
                       key={`list.${dayKey}`}
                       className="flights-overview-tile-column"
                     >
+                      {!cheapFlights[dayKey].length && (
+                        <div className="flights-overview-no-flights">
+                          No flight options found for this date
+                        </div>
+                      )}
                       {cheapFlights[dayKey].map((flight, j) => (
                         <div
                           key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}

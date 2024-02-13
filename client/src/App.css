@@ -54,7 +54,7 @@ header {
   min-height: 8rem;
   margin: auto;
   margin-top: auto;
-  padding: 1rem 1rem;
+  padding: var(--padding-gap) var(--padding-gap);
   display: flex;
   position: relative;
   flex: auto;
@@ -98,6 +98,7 @@ header {
   padding: 0.4rem calc(0.4rem + var(--shadow-offset)) 0.4rem 0.4rem;
   background-color: var(--color-white);
   z-index: 2;
+  transition: calc(2 * var(--transform-len));
 }
 .flight-options {
   max-width: var(--max-width);
@@ -146,14 +147,18 @@ header .flight-option-wrapper,
   font-weight: 600;
   justify-content: center;
 }
+.nav-mobile {
+  display: none;
+}
 
 /* Main */
 
 main {
+  width: 100%;
   max-width: var(--max-width);
   display: flex;
   margin: auto;
-  padding: 0 1rem;
+  padding: 0 var(--padding-gap);
   align-items: flex-start;
   transition: flex-grow 1s ease-in-out;
 }
@@ -162,10 +167,10 @@ main {
 
 .welcome-container {
   max-width: var(--max-width);
-  width: 100%;
   height: 100%;
   display: flex;
-  padding: 1rem 0;
+  margin: 0 auto;
+  padding: 1rem;
   flex-direction: column;
   align-items: flex-end;
   transition: var(--transform-len);
@@ -310,7 +315,7 @@ main {
 
 .flights-overview-container {
   width: 100%;
-  padding: 0 0 0 1rem;
+  padding: 0 0 0 var(--padding-gap);
 }
 .flights-overview {
   display: flex;
@@ -331,18 +336,15 @@ main {
 .flights-overview-headers {
   position: sticky;
   top: 2.8rem;
+  grid-template-rows: min-content;
   z-index: 20;
 }
 .flights-overview-headers,
 .flights-overview-tiles {
-  max-width: 200%;
-  display: flex;
-  gap: var(--padding-gap);
-}
-.flights-overview-header,
-.flights-overview-tile-column {
-  min-width: calc(25% - var(--padding-gap));
-  max-width: calc(25% - var(--padding-gap));
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(8, calc(25% - var(--padding-gap)));
+  grid-gap: var(--padding-gap);
 }
 .flights-overview-header {
   overflow: hidden;
@@ -350,9 +352,11 @@ main {
   border-bottom: 0.2rem solid var(--color-gold);
   border-top: var(--padding-gap) solid var(--color-gray-shadow);
   box-shadow: var(--shadow-offset) 0 var(--color-gray-shadow);
+  --header-height: 3rem;
+  height: var(--header-height);
 }
 .flights-overview-header h3 {
-  height: 120%;
+  height: calc(1rem + var(--header-height));
   padding: 0.4rem 0.9rem 0.2rem;
   background: var(--color-blue-gradient);
   border-radius: var(--border-radius);
@@ -363,6 +367,15 @@ main {
   display: flex;
   gap: calc(2 * var(--shadow-offset));
   flex-direction: column;
+}
+.flights-overview-no-flights {
+  min-height: 16rem;
+  display: flex;
+  padding: 1rem;
+  align-items: center;
+  text-align: center;
+  background: var(--color-white);
+  border-radius: var(--border-radius);
 }
 .flights-overview-arrow {
   cursor: pointer;
@@ -572,7 +585,22 @@ footer {
 
 /* Responsive */
 
-@media (max-width: 576px) {
+@media (max-width: 996px) {
+  .nav-mobile {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline;
+    position: sticky;
+    top: var(--padding-gap);
+    margin: var(--padding-gap);
+    align-self: flex-end;
+    background: var(--color-magenta);
+    color: var(--color-white);
+    font-size: 1.4rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) var(--color-white);
+    z-index: 20;
+  }
   header {
     flex-direction: column-reverse;
   }
@@ -580,12 +608,6 @@ footer {
     position: relative;
     padding-top: 2rem;
   }
-  .header-logo h1 {
-    line-height: 1;
-  }
-}
-
-@media (max-width: 996px) {
   .flight-options-container {
     width: auto;
     margin: auto;
@@ -600,12 +622,21 @@ footer {
   .welcome-container {
     display: none;
   }
-  .flights-overview-header,
-  .flights-overview-tile-column {
-    min-width: calc(50% - var(--padding-gap));
-    max-width: calc(50% - var(--padding-gap));
+  .flights-overview-headers,
+  .flights-overview-tiles {
+    grid-template-columns: repeat(8, calc(50% - var(--padding-gap)));
+  }
+  .flights-overview-headers {
+    top: 0;
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 576px) {
+  .header-logo h1 {
+    line-height: 1;
+  }
+  .flights-overview-headers,
+  .flights-overview-tiles {
+    width: 200%;
+  }
 }

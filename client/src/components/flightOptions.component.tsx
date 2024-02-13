@@ -3,7 +3,7 @@
  */
 
 //  External dependencies
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { AsyncPaginate } from 'react-select-async-paginate';
@@ -93,6 +93,9 @@ function FlightOptions({
   composeRequest: (requestBody: libFd.CheapestFlightsRequest) => void;
 }) {
   //  State hooks
+  const [mobileNavVisible, showMobileNav] = useState(false);
+
+  //  State hooks
   const [pickedAirport, pickAirport] = useState<libFd.Option>();
   const [tripLength, setTripLength] = useState<libFd.Option>(c.OPTION_ONE_WAY);
   const [showWeeks, setShowWeeks] = useState<libFd.Option>(
@@ -155,11 +158,40 @@ function FlightOptions({
       requestBody.returnDate += 1000 * 3600 * 24 * Number(tripLength.value);
     }
     composeRequest(requestBody);
+    toggleMobileNav();
+  };
+
+  const toggleMobileNav = (e?: React.MouseEvent) => {
+    showMobileNav(!mobileNavVisible);
+
+    const navMenu: HTMLElement | null = document.getElementById('nav-menu'); // TODO
+    if (!navMenu) {
+      alert(
+        `Application has some issues... We apologize for the inconvenience. Please try again later.`
+      );
+      return;
+    }
+    const navMobile: HTMLButtonElement | undefined =
+      e?.currentTarget as HTMLButtonElement;
+    if (mobileNavVisible) {
+      navMenu.style.top = '0';
+      navMobile && (navMobile.textContent = '✖');
+    } else {
+      navMenu.style.top = '-100%';
+      navMobile && (navMobile.textContent = '☰');
+    }
   };
 
   return (
     <>
-      <nav className="flight-options-container">
+      <button
+        id="nav-mobile"
+        className="nav-mobile"
+        onClick={e => toggleMobileNav(e)}
+      >
+        ☰
+      </button>
+      <nav id="nav-menu" className="flight-options-container">
         <form action="submit" className="flight-options" role="flight-options">
           {/* Origin selector */}
           <div className="flight-option-wrapper">
