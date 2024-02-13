@@ -23,6 +23,10 @@ function FlightDetail({
 }) {
   const [flightInfo, setFlightInfo] = useState<FlightInfoProcessed>();
 
+  const getTimeLocal = (time: number) => {
+    return moment(time).utc().format('HH:mm');
+  };
+
   useEffect(() => {
     if (flightData) {
       let flightDataProcessed: FlightInfoProcessed = {
@@ -45,8 +49,8 @@ function FlightDetail({
               airports.find(
                 airport => airport.value === segment.destinationPlaceId
               )?.label ?? 'Unknown airport',
-            departure: moment(segment.departure).format('HH:mm'),
-            arrival: moment(segment.arrival).format('HH:mm'),
+            departure: getTimeLocal(segment.departure),
+            arrival: getTimeLocal(segment.arrival),
           });
         });
         setFlightInfo(flightDataProcessed);
