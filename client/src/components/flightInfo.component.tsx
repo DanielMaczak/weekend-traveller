@@ -3,7 +3,7 @@
  */
 
 //  External dependencies
-import { forwardRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 //  Internal dependencies
 import * as libFd from '../libraries/flightData.service';
@@ -78,17 +78,17 @@ function FlightInfo({
    * Composes body of individual flight info request.
    * Uses input for flight list search so no validation needed.
    */
+  const flightInfoRequest: libFd.FlightInfoRequest = {
+    currencyCode: requestBody.currencyCode,
+    localeCode: requestBody.localeCode,
+    marketCode: requestBody.marketCode,
+    originPlaceId: requestBody.originPlaceId,
+    destinationPlaceId: flightInfo.destinationPlaceId,
+    travelDate: flightDate,
+  };
   const getFlightDetail = () => {
     showDetails(!detailsVisible);
     if (flightData) return;
-    const flightInfoRequest: libFd.FlightInfoRequest = {
-      currencyCode: requestBody.currencyCode,
-      localeCode: requestBody.localeCode,
-      marketCode: requestBody.marketCode,
-      originPlaceId: requestBody.originPlaceId,
-      destinationPlaceId: flightInfo.destinationPlaceId,
-      travelDate: flightDate,
-    };
     if (returnDate) {
       flightInfoRequest.returnDate = returnDate;
     }
@@ -144,7 +144,7 @@ function FlightInfo({
               >
                 <FlightDetail
                   flightData={flightData}
-                  requestBody={requestBody}
+                  requestBody={flightInfoRequest}
                 />
               </div>
             )}

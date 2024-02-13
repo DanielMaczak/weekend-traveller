@@ -9,9 +9,13 @@ interface FlightInfoProcessed {
     destinationAirport: string;
     departure: string;
     arrival: string;
+    departureAddDays: number;
+    arrivalAddDays: number;
   }[];
-  vendorLink: string;
-  price: string;
+  links: {
+    vendorLink: string;
+    price: number;
+  }[];
 }
 
 function FlightDetail({
@@ -19,7 +23,7 @@ function FlightDetail({
   requestBody,
 }: {
   flightData: libFd.FlightInfo | undefined;
-  requestBody: libFd.CheapestFlightsRequest;
+  requestBody: libFd.FlightInfoRequest;
 }) {
   const [flightInfo, setFlightInfo] = useState<FlightInfoProcessed>();
 
@@ -31,15 +35,14 @@ function FlightDetail({
     if (flightData) {
       let flightDataProcessed: FlightInfoProcessed = {
         segments: [],
-        vendorLink: flightData.vendorLink,
-        price: flightData.price.toLocaleString(requestBody.localeCode, {
-          style: 'currency',
-          currency: requestBody.currencyCode,
-        }),
+        links: flightData.links,
       };
 
       getAirports().then(airports => {
         if (!airports) return; // already checked in flight options
+        const startDay: number = moment(requestBody.travelDate)
+          .utc()
+          .dayOfYear();
         flightData.segments.forEach(segment => {
           flightDataProcessed.segments.push({
             originAirport:
@@ -51,6 +54,10 @@ function FlightDetail({
               )?.label ?? 'Unknown airport',
             departure: getTimeLocal(segment.departure),
             arrival: getTimeLocal(segment.arrival),
+            departureAddDays:
+              moment(segment.departure).utc().dayOfYear() - startDay,
+            arrivalAddDays:
+              moment(segment.arrival).utc().dayOfYear() - startDay,
           });
         });
         setFlightInfo(flightDataProcessed);
@@ -69,6 +76,13 @@ function FlightDetail({
                   {segment.originAirport}
                 </span>
                 <span className="flight-tile-segment-time">
+                  {segment.departureAddDays ? (
+                    <sup className="flight-tile-add-days">
+                      +{segment.departureAddDays}
+                    </sup>
+                  ) : (
+                    ''
+                  )}
                   {segment.departure}
                 </span>
               </p>
@@ -77,17 +91,35 @@ function FlightDetail({
                   {segment.destinationAirport}
                 </span>
                 <span className="flight-tile-segment-time">
+                  {segment.arrivalAddDays ? (
+                    <sup className="flight-tile-add-days">
+                      +{segment.arrivalAddDays}
+                    </sup>
+                  ) : (
+                    ''
+                  )}
                   {segment.arrival}
                 </span>
               </p>
             </div>
           ))}
-          <a target="_blank" rel="noreferrer" href={flightInfo?.vendorLink}>
-            <div className="flight-tile-final-price">
-              <span>Exact price:</span>
-              <span>{flightInfo?.price}</span>
-            </div>
-          </a>
+          {flightInfo?.links.map((link, i) => (
+            <a target="_blank" rel="noreferrer" href={link.vendorLink}>
+              <div className="flight-tile-final-price">
+                {flightInfo?.links.length > 1 ? (
+                  <span>{`Visit vendor ${i + 1}:`}</span>
+                ) : (
+                  <span>{`Visit vendor:`}</span>
+                )}
+                <span>
+                  {link.price.toLocaleString(requestBody.localeCode, {
+                    style: 'currency',
+                    currency: requestBody.currencyCode,
+                  })}
+                </span>
+              </div>
+            </a>
+          ))}
         </>
       ) : (
         <div className="flight-tile-segment">

@@ -375,48 +375,48 @@ export const postFlightInfoRequest = async (
     dataIn.content.sortingOptions.cheapest[0].itineraryId;
   const cheapestItinerary =
     dataIn.content.results.itineraries[cheapestItineraryId];
-  const price: string =
-    cheapestItinerary.pricingOptions[0].items[0].price.amount;
-  const vendorLink: string =
-    cheapestItinerary.pricingOptions[0].items[0].deepLink;
-  const fares = cheapestItinerary.pricingOptions[0].items[0].fares;
   const segments = dataIn.content.results.segments;
   const carriers = dataIn.content.results.carriers;
 
   //  Process data to internal format
   const dataProc: libFd.FlightInfo = {
     segments: [],
-    vendorLink: vendorLink,
-    price: Number(price) / 1000,
+    links: [],
   };
-  for (let fare of fares) {
-    const segmentId: string = fare.segmentId;
-    const segment = segments[segmentId];
-    const departureDateTime: Date = new Date(
-      Date.UTC(
-        segment.departureDateTime.year,
-        segment.departureDateTime.month - 1,
-        segment.departureDateTime.day,
-        segment.departureDateTime.hour,
-        segment.departureDateTime.minute
-      )
-    );
-    const arrivalDateTime: Date = new Date(
-      Date.UTC(
-        segment.arrivalDateTime.year,
-        segment.arrivalDateTime.month - 1,
-        segment.arrivalDateTime.day,
-        segment.arrivalDateTime.hour,
-        segment.arrivalDateTime.minute
-      )
-    );
-    dataProc.segments.push({
-      originPlaceId: segment.originPlaceId,
-      destinationPlaceId: segment.destinationPlaceId,
-      departure: departureDateTime.valueOf(),
-      arrival: arrivalDateTime.valueOf(),
-      airlinePic: carriers[segment.operatingCarrierId].imageUrl,
+  for (let item of cheapestItinerary.pricingOptions[0].items) {
+    dataProc.links.push({
+      vendorLink: item.deepLink,
+      price: parseFloat(item.price.amount) / 1000,
     });
+    for (let fare of item.fares) {
+      const segmentId: string = fare.segmentId;
+      const segment = segments[segmentId];
+      const departureDateTime: Date = new Date(
+        Date.UTC(
+          segment.departureDateTime.year,
+          segment.departureDateTime.month - 1,
+          segment.departureDateTime.day,
+          segment.departureDateTime.hour,
+          segment.departureDateTime.minute
+        )
+      );
+      const arrivalDateTime: Date = new Date(
+        Date.UTC(
+          segment.arrivalDateTime.year,
+          segment.arrivalDateTime.month - 1,
+          segment.arrivalDateTime.day,
+          segment.arrivalDateTime.hour,
+          segment.arrivalDateTime.minute
+        )
+      );
+      dataProc.segments.push({
+        originPlaceId: segment.originPlaceId,
+        destinationPlaceId: segment.destinationPlaceId,
+        departure: departureDateTime.valueOf(),
+        arrival: arrivalDateTime.valueOf(),
+        airlinePic: carriers[segment.operatingCarrierId].imageUrl,
+      });
+    }
   }
 
   //  Check data came in correct format
@@ -427,8 +427,9 @@ export const postFlightInfoRequest = async (
     dataProc.segments[0].destinationPlaceId === undefined ||
     dataProc.segments[0].departure === undefined ||
     dataProc.segments[0].arrival === undefined ||
-    dataProc.vendorLink === undefined ||
-    dataProc.price === undefined
+    !dataProc.links.length ||
+    dataProc.links[0].vendorLink === undefined ||
+    dataProc.links[0].price === undefined
   ) {
     throw new errors.BadGateway(
       'One or more data points missing from received data.'

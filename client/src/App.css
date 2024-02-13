@@ -324,6 +324,7 @@ main {
 .flights-overview-headers {
   position: sticky;
   top: 2.8rem;
+  z-index: 20;
 }
 .flights-overview-headers,
 .flights-overview-tiles {
@@ -441,7 +442,7 @@ main {
   display: flex;
   position: relative;
   justify-content: space-between;
-  --tile-time-width: 2rem;
+  --tile-time-width: 3.5rem;
 }
 .flight-tile-segment-airport {
   width: calc(100% - (var(--tile-time-width) + 1rem));
@@ -454,13 +455,19 @@ main {
   width: var(--tile-time-width);
   position: relative;
   left: calc(100% - var(--tile-time-width));
+  text-align: right;
+}
+.flight-tile-add-days {
+  position: relative;
+  right: 0.2rem;
+  color: var(--color-red);
 }
 .flight-tile a {
   text-decoration: none;
 }
 .flight-tile-final-price {
-  width: 100%;
   display: flex;
+  margin: 0.1rem;
   padding: var(--tile-padding-v) var(--tile-padding-h);
   color: var(--color-gray-text);
   justify-content: space-between;

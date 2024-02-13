@@ -65,6 +65,8 @@ export interface FlightSegment {
 }
 export interface FlightInfo {
   segments: FlightSegment[];
-  vendorLink: string;
-  price: number;
+  links: {
+    vendorLink: string;
+    price: number;
+  }[];
 }
