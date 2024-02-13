@@ -86,12 +86,12 @@ function FlightInfo({
     destinationPlaceId: flightInfo.destinationPlaceId,
     travelDate: flightDate,
   };
+  if (returnDate) {
+    flightInfoRequest.returnDate = returnDate;
+  }
   const getFlightDetail = () => {
     showDetails(!detailsVisible);
     if (flightData) return;
-    if (returnDate) {
-      flightInfoRequest.returnDate = returnDate;
-    }
     postFlightInfoRequest(flightInfoRequest).then(data => {
       if (!data) {
         alert(`Couldn't load data for this flight. Please try again later.`);
@@ -105,30 +105,32 @@ function FlightInfo({
   return (
     <>
       {destination ? (
-        <li className="flight-tile" onClick={getFlightDetail}>
-          <div className="flight-tile-header">{destination.label}</div>
-          <div className="flight-tile-info">
-            {/* Vendor pictures */}
-            <div className="flight-tile-info-vendors">
-              <img src={flightInfo.vendorTherePic} alt="" />
-              {flightInfo.vendorBackPic ? (
-                <img src={flightInfo.vendorBackPic} alt="" />
-              ) : (
-                ''
-              )}
-            </div>
-            {/* Transfer / Price */}
-            <div className="flight-tile-price-transfer">
-              {flightInfo.hasTransfers && (
-                <span className="flight-tile-transfer">Transfer</span>
-              )}
-              <span className="flight-tile-price">
-                ~{' '}
-                {flightInfo.price.toLocaleString(requestBody.localeCode, {
-                  style: 'currency',
-                  currency: requestBody.currencyCode,
-                })}
-              </span>
+        <li className="flight-tile">
+          <div onClick={getFlightDetail}>
+            <div className="flight-tile-header">{destination.label}</div>
+            <div className="flight-tile-info">
+              {/* Vendor pictures */}
+              <div className="flight-tile-info-vendors">
+                <img src={flightInfo.vendorTherePic} alt="" />
+                {flightInfo.vendorBackPic ? (
+                  <img src={flightInfo.vendorBackPic} alt="" />
+                ) : (
+                  ''
+                )}
+              </div>
+              {/* Transfer / Price */}
+              <div className="flight-tile-price-transfer">
+                {flightInfo.hasTransfers && (
+                  <span className="flight-tile-transfer">Transfer</span>
+                )}
+                <span className="flight-tile-price">
+                  ~{' '}
+                  {flightInfo.price.toLocaleString(requestBody.localeCode, {
+                    style: 'currency',
+                    currency: requestBody.currencyCode,
+                  })}
+                </span>
+              </div>
             </div>
           </div>
 

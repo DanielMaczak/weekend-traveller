@@ -11,6 +11,7 @@ interface FlightInfoProcessed {
     arrival: string;
     departureAddDays: number;
     arrivalAddDays: number;
+    isReturnTrip: boolean;
   }[];
   links: {
     vendorLink: string;
@@ -28,7 +29,7 @@ function FlightDetail({
   const [flightInfo, setFlightInfo] = useState<FlightInfoProcessed>();
 
   const getTimeLocal = (time: number) => {
-    return moment(time).utc().format('HH:mm');
+    return moment(time).utc();
   };
 
   useEffect(() => {
@@ -40,10 +41,17 @@ function FlightDetail({
 
       getAirports().then(airports => {
         if (!airports) return; // already checked in flight options
-        const startDay: number = moment(requestBody.travelDate)
-          .utc()
-          .dayOfYear();
+        const travelDay: number = getTimeLocal(
+          requestBody.travelDate
+        ).dayOfYear();
+        const returnDay: number = getTimeLocal(
+          requestBody.returnDate ?? 0
+        ).dayOfYear();
         flightData.segments.forEach(segment => {
+          const isReturnSegment: boolean = Boolean(
+            requestBody.returnDate &&
+              segment.departure >= requestBody.returnDate
+          );
           flightDataProcessed.segments.push({
             originAirport:
               airports.find(airport => airport.value === segment.originPlaceId)
@@ -52,12 +60,15 @@ function FlightDetail({
               airports.find(
                 airport => airport.value === segment.destinationPlaceId
               )?.label ?? 'Unknown airport',
-            departure: getTimeLocal(segment.departure),
-            arrival: getTimeLocal(segment.arrival),
+            departure: getTimeLocal(segment.departure).format('HH:mm'),
+            arrival: getTimeLocal(segment.arrival).format('HH:mm'),
             departureAddDays:
-              moment(segment.departure).utc().dayOfYear() - startDay,
+              getTimeLocal(segment.departure).dayOfYear() -
+              (isReturnSegment ? returnDay : travelDay),
             arrivalAddDays:
-              moment(segment.arrival).utc().dayOfYear() - startDay,
+              getTimeLocal(segment.arrival).dayOfYear() -
+              (isReturnSegment ? returnDay : travelDay),
+            isReturnTrip: isReturnSegment,
           });
         });
         setFlightInfo(flightDataProcessed);
@@ -70,7 +81,12 @@ function FlightDetail({
       {flightInfo ? (
         <>
           {flightInfo?.segments.map(segment => (
-            <div className="flight-tile-segment">
+            <div
+              className={
+                'flight-tile-segment' +
+                (segment.isReturnTrip ? ' flight-tile-return' : '')
+              }
+            >
               <p className="flight-tile-segment-info">
                 <span className="flight-tile-segment-airport">
                   {segment.originAirport}

@@ -201,7 +201,7 @@ function FlightOptions({
               required
             />
             {tripLength.value !== c.OPTION_ONE_WAY.value ? (
-              <label className="flight-option-label">
+              <label className="flight-option-label-behind">
                 {tripLength.value === '1' ? 'day' : 'days'}
               </label>
             ) : (
@@ -219,7 +219,7 @@ function FlightOptions({
               options={c.OPTIONS_SHOW_WEEKS}
               required
             />
-            <label className="flight-option-label">weeks</label>
+            <label className="flight-option-label-behind">weeks</label>
           </div>
           {/* Search button */}
           <button
