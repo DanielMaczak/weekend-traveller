@@ -3,7 +3,8 @@
  */
 
 //  External dependencies
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { Transition } from 'react-transition-group';
 
 //  Internal dependencies
 import * as libFd from '../libraries/flightData.service';
@@ -13,17 +14,12 @@ import {
 } from '../services/flightData.service';
 import FlightDetail from './flightDetail.component';
 
-//  External dependencies
-import { useRef } from 'react';
-import { Transition } from 'react-transition-group';
-
-const duration = 500;
-
+//  Transition setup
+const transitionDuration = 500; // ms
 const defaultStyle = {
-  transition: `${duration}ms ease-in-out`,
+  transition: `${transitionDuration}ms ease-in-out`,
   maxHeight: 0,
 };
-
 const transitionStyles: { [key: string]: {} } = {
   entering: { maxHeight: 0 },
   entered: { maxHeight: '1000px' },
@@ -55,11 +51,8 @@ function FlightInfo({
 }) {
   //  State hooks
   const nodeRef = useRef(null);
-
-  //  State hooks
   const [flightData, setFlightData] = useState<libFd.FlightInfo>();
   const [destination, setDestination] = useState<libFd.Option>();
-
   const [detailsVisible, showDetails] = useState(false);
 
   //  Data load hooks
@@ -106,6 +99,7 @@ function FlightInfo({
     <>
       {destination ? (
         <li className="flight-tile">
+          {/* Flight into */}
           <div onClick={getFlightDetail}>
             <div className="flight-tile-header">{destination.label}</div>
             <div className="flight-tile-info">
@@ -133,8 +127,12 @@ function FlightInfo({
               </div>
             </div>
           </div>
-
-          <Transition nodeRef={nodeRef} in={detailsVisible} timeout={duration}>
+          {/* Flight detail # visible on click */}
+          <Transition
+            nodeRef={nodeRef}
+            in={detailsVisible}
+            timeout={transitionDuration}
+          >
             {(state: string) => (
               <div
                 ref={nodeRef}

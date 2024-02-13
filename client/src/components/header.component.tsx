@@ -1,10 +1,11 @@
 /**
  * @version 1.0.0
+ * @version 1.1.0 Optimize hook calls to reduce rerenders
  */
 
 //  External dependencies
 import { useContext, useEffect, useState } from 'react';
-import Select from 'react-select';
+import Select, { SingleValue } from 'react-select';
 
 //  Internal dependencies
 import { LocaleContext } from '../App';
@@ -17,17 +18,10 @@ import { getCurrencies } from '../services/flightData.service';
  * Market selector is listed as disabled:
  * it was meant as bonus feature where page would show in local language.
  * This might be possible via translation API call.
- * @param selectedCurrency auto-selected from Locale info
- * @param selectCurrency state hook updated when user makes own selection
  */
-function Header({
-  selectedCurrency,
-  selectCurrency,
-}: {
-  selectedCurrency: string;
-  selectCurrency: (currency: string) => void;
-}) {
+function Header() {
   //  State hooks
+  const { localeInfo, setLocaleInfo } = useContext(LocaleContext);
   const [currencies, setCurrencies] = useState<libFd.Currencies>();
 
   //  Data load hooks
@@ -44,6 +38,18 @@ function Header({
     });
   }, []);
 
+  /**
+   * Updates global context with currency selected by user.
+   * @param selected value user selected
+   */
+  const updateCurrency = (selected: SingleValue<libFd.Option>) => {
+    if (!selected) return;
+    setLocaleInfo({
+      ...localeInfo,
+      currencyCode: selected.value,
+    });
+  };
+
   return (
     <>
       <header role="header">
@@ -56,9 +62,7 @@ function Header({
           {/* Market selector # Disabled */}
           <div className="flight-option-wrapper-disabled">
             <label className="flight-option-label">Your location:</label>
-            <span className="option-value">
-              {useContext(LocaleContext).locationName}
-            </span>
+            <span className="option-value">{localeInfo.locationName}</span>
           </div>
           {/* Currency selector */}
           <div className="flight-option-wrapper">
@@ -67,10 +71,10 @@ function Header({
               className="option-dropdown"
               classNamePrefix="option-dropdown"
               value={{
-                value: selectedCurrency,
-                label: selectedCurrency,
+                value: localeInfo.currencyCode,
+                label: localeInfo.currencyCode,
               }}
-              onChange={selected => selected && selectCurrency(selected.value)}
+              onChange={selected => updateCurrency(selected)}
               options={currencies}
             />
           </div>

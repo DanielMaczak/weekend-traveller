@@ -1,5 +1,6 @@
 /**
  * @version 1.0.0
+ * @version 1.1.0 Add responsive mobile button
  */
 
 //  External dependencies
@@ -93,9 +94,7 @@ function FlightOptions({
   composeRequest: (requestBody: libFd.CheapestFlightsRequest) => void;
 }) {
   //  State hooks
-  const [mobileNavVisible, showMobileNav] = useState(false);
-
-  //  State hooks
+  const [mobileNavVisible, showMobileNav] = useState<boolean>(false);
   const [pickedAirport, pickAirport] = useState<libFd.Option>();
   const [tripLength, setTripLength] = useState<libFd.Option>(c.OPTION_ONE_WAY);
   const [showWeeks, setShowWeeks] = useState<libFd.Option>(
@@ -106,7 +105,7 @@ function FlightOptions({
   );
 
   //  Context hooks
-  const localeInfo: libFd.LocaleInfo = useContext(LocaleContext);
+  const { localeInfo } = useContext(LocaleContext);
 
   /**
    * Composes body of cheapest flights search from controls in this view.
@@ -158,40 +157,53 @@ function FlightOptions({
       requestBody.returnDate += 1000 * 3600 * 24 * Number(tripLength.value);
     }
     composeRequest(requestBody);
-    toggleMobileNav();
+    toggleMobileNav(false);
   };
 
-  const toggleMobileNav = (e?: React.MouseEvent) => {
-    showMobileNav(!mobileNavVisible);
+  /**
+   * Change navbar coordinates and icon on menu button click.
+   * This button is (supposed to be) displayed only on middle / small devices.
+   * @param e Mouse event
+   */
+  const toggleMobileNav = (showButton?: boolean) => {
+    //  State is switched first
+    showButton === undefined
+      ? showMobileNav(!mobileNavVisible)
+      : showMobileNav(showButton);
 
-    const navMenu: HTMLElement | null = document.getElementById('nav-menu'); // TODO
-    if (!navMenu) {
+    //  Locate DOM elements
+    const navMenu: HTMLElement | null = document.getElementById(c.ID_NAV_MENU);
+    const navButton: HTMLElement | null = document.getElementById(
+      c.ID_NAV_BUTTON
+    );
+    if (!navMenu || !navButton) {
       alert(
-        `Application has some issues... We apologize for the inconvenience. Please try again later.`
+        `Application has some issues. ` +
+          `We apologize for the inconvenience. Please try again later.`
       );
       return;
     }
-    const navMobile: HTMLButtonElement | undefined =
-      e?.currentTarget as HTMLButtonElement;
+
+    //  Update menu position and menu button icon
     if (mobileNavVisible) {
       navMenu.style.top = '0';
-      navMobile && (navMobile.textContent = '✖');
+      navButton && (navButton.textContent = '✖');
     } else {
       navMenu.style.top = '-100%';
-      navMobile && (navMobile.textContent = '☰');
+      navButton && (navButton.textContent = '☰');
     }
   };
 
   return (
     <>
       <button
-        id="nav-mobile"
+        id={c.ID_NAV_BUTTON}
         className="nav-mobile"
-        onClick={e => toggleMobileNav(e)}
+        onClick={() => toggleMobileNav()}
       >
         ☰
       </button>
-      <nav id="nav-menu" className="flight-options-container">
+      <nav id={c.ID_NAV_MENU} className="flight-options-container">
         <form action="submit" className="flight-options" role="flight-options">
           {/* Origin selector */}
           <div className="flight-option-wrapper">

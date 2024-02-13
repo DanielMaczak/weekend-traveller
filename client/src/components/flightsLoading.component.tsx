@@ -1,18 +1,18 @@
 /**
  * @version 1.0.0
+ * @version 1.1.0 Create new animation, add transition
  */
 
 //  External dependencies
 import { useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
-const duration = 500;
-
+//  Transition setup
+const transitionDuration = 250; // ms
 const defaultStyle = {
-  transition: `${duration}ms ease-in-out`,
+  transition: `${transitionDuration}ms ease-in-out`,
   opacity: 0,
 };
-
 const transitionStyles: { [key: string]: {} } = {
   entering: { opacity: 0 },
   entered: { opacity: 1 },
@@ -23,13 +23,15 @@ const transitionStyles: { [key: string]: {} } = {
 /**
  * @module
  * Animated loading text while app searches for flights.
+ * @param loadingVisible change of this triggers transition on-off
+ * @param nextDashboard trigger for next dashboard to show up
  */
 function FlightsLoading({
   loadingVisible,
-  nextStep,
+  nextDashboard,
 }: {
   loadingVisible: boolean;
-  nextStep: (status: boolean) => void;
+  nextDashboard: () => void;
 }) {
   //  State hooks
   const nodeRef = useRef(null);
@@ -40,8 +42,8 @@ function FlightsLoading({
       <Transition
         nodeRef={nodeRef}
         in={loadingVisible}
-        timeout={duration}
-        onExited={() => nextStep(true)}
+        timeout={transitionDuration}
+        onExited={nextDashboard}
       >
         {(state: string) => (
           <div

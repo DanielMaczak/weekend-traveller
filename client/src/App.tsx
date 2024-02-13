@@ -1,12 +1,14 @@
 /**
  * @author Daniel Maczak / where not specified otherwise
  * @version 1.0.0
+ * @version 1.1.0 Move context provider into separate component,
+ *                move currency hook into Header to reduce rerenders
  */
 
 //  External dependencies
 import 'react-datepicker/dist/react-datepicker.css';
 import './App.css';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 //  Internal dependencies
 import * as libFd from './libraries/flightData.service';
@@ -24,43 +26,54 @@ const defaultLocaleInfo: libFd.LocaleInfo = {
   currencyCode: 'USD',
   localeCode: 'en-US',
 };
-export const LocaleContext: React.Context<libFd.LocaleInfo> =
-  React.createContext(defaultLocaleInfo);
+export const LocaleContext = React.createContext({
+  localeInfo: defaultLocaleInfo,
+  setLocaleInfo: (_: libFd.LocaleInfo) => {},
+});
 
 /**
  * @module
  * Top-level app component.
- * Keeps accurate locale info at all times.
  */
 function App() {
+  return (
+    <>
+      <AppContext>
+        <Header />
+        <FlightsDashboard />
+        <Footer />
+      </AppContext>
+    </>
+  );
+}
+
+/**
+ * Hosts context to reduce rerenders in App.
+ * Provides locale info object to components.
+ * @param props React props
+ */
+function AppContext(props: React.PropsWithChildren) {
   //  State hooks
   const [localeInfo, setLocaleInfo] =
     useState<libFd.LocaleInfo>(defaultLocaleInfo);
-  const [selectedCurrency, selectCurrency] = useState<string>(
-    useContext(LocaleContext).currencyCode
-  );
 
   //  Data update hooks
   useEffect(() => {
     postLocaleInfoRequest().then(data => {
       if (!data) return; // will use fallback values
       setLocaleInfo({ ...data, localeCode: c.GLOBAL_LOCALE });
-      selectCurrency(data.currencyCode); // autoselect currency for user
     });
   }, []);
-  useEffect(() => {
-    setLocaleInfo({ ...localeInfo, currencyCode: selectedCurrency });
-  }, [selectedCurrency]);
 
   return (
     <>
-      <LocaleContext.Provider value={localeInfo}>
-        <Header
-          selectedCurrency={selectedCurrency}
-          selectCurrency={selectCurrency}
-        />
-        <FlightsDashboard />
-        <Footer />
+      <LocaleContext.Provider
+        value={{
+          localeInfo: localeInfo,
+          setLocaleInfo: setLocaleInfo,
+        }}
+      >
+        {props.children}
       </LocaleContext.Provider>
     </>
   );

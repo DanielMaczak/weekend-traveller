@@ -1,30 +1,29 @@
 /**
  * @version 1.0.0
+ * @version 1.1.0 Add buttons to move view when more weeks are loaded,
+ *                add transition
  */
-
-//  External dependencies
-import moment from 'moment';
-
-//  Internal dependencies
-import * as libFd from '../libraries/flightData.service';
-import FlightInfo from './flightInfo.component';
 
 //  External dependencies
 import { useRef } from 'react';
 import { Transition } from 'react-transition-group';
+import moment from 'moment';
 
-const duration = 250;
+//  Internal dependencies
+import * as c from '../services/const.service';
+import * as libFd from '../libraries/flightData.service';
+import FlightInfo from './flightInfo.component';
 
+//  Transition setup
+const transitionDuration = 250; // ms
 const defaultStyle = {
-  transition: `${duration}ms ease-in-out`,
+  transition: `${transitionDuration}ms ease-in-out`,
   opacity: 0,
 };
-
 const transitionStyles: { [key: string]: {} } = {
   entering: { opacity: 0 },
   entered: { opacity: 1 },
   exiting: { opacity: 0 },
-  exited: { opacity: 0 },
 };
 
 /**
@@ -46,24 +45,22 @@ const getDateOffset = (
  * Displays flight options in grid based on user's query.
  * @param cheapFlights object of sorted cheapest flights lists per day
  * @param requestBody request generating cheapFlights with additional info
+ * @param flightsVisible change of this triggers transition on-off
+ * @param nextDashboard trigger for next dashboard to show up
  */
 function FlightsOverview({
   cheapFlights,
   requestBody,
   flightsVisible,
-  nextStep,
+  nextDashboard,
 }: {
   cheapFlights: libFd.CheapestFlights;
   requestBody: libFd.CheapestFlightsRequest;
   flightsVisible: boolean;
-  nextStep: (status: boolean) => void;
+  nextDashboard: () => void;
 }) {
   //  State hooks
   const nodeRef = useRef(null);
-
-  const screenWidth: number =
-    document.body.clientWidth * window.devicePixelRatio;
-  const columns: number = screenWidth <= 576 ? 1 : screenWidth <= 996 ? 2 : 4;
 
   //  Provide easy access to travel dates based on table column.
   const getTravelDate = (addWeeks: number): number =>
@@ -71,23 +68,50 @@ function FlightsOverview({
   const getReturnDate = (addWeeks: number): number =>
     getDateOffset(requestBody.returnDate ?? 0, addWeeks);
 
-  const moveFlightsOverview = (applyOffset: number) => {
-    console.log(screenWidth, columns);
+  //  Calculate number of displayed columns
+  const screenWidth: number =
+    document.body.clientWidth * window.devicePixelRatio;
+  const columns: number =
+    screenWidth <= c.CSS_SCREEN_WIDTH_MOBILE
+      ? 1 // show single column for mobile
+      : screenWidth <= c.CSS_SCREEN_WIDTH_TABLET
+      ? 2 // columns for mid-size devices
+      : 4; // columns for anything bigger
 
+  /**
+   * Applies offset to flights overview to scroll to next / previous week.
+   * Positive offset moves to the left.
+   * @param applyOffset 1 or -1 to move left or right by one tile
+   */
+  const moveFlightsOverview = (applyOffset: -1 | 1) => {
     if (requestBody.lookAtWeeks <= columns) return;
-    applyOffset = Math.min(1, Math.max(-1, applyOffset)) / columns;
+
+    //  Locate flights tile container to offset
     const overflowContainer: HTMLElement | null = document.getElementById(
-      'flights-overview-overflow-container'
+      c.ID_FLIGHTS_CONTAINER
     );
     if (!overflowContainer) return;
-    const minOffset: number = -(requestBody.lookAtWeeks - columns) / columns;
+
+    //  Calculate new offset to apply:
+
+    //  1. Offset % based on tile width
+    applyOffset /= columns;
+    //  2. Count hidden columns to determine maximum offset distance in %
+    const hiddenColumns: number = Math.max(
+      requestBody.lookAtWeeks - columns,
+      0
+    );
+    const minOffset: number = -hiddenColumns / columns;
     const maxOffset: number = 0;
+    //  3. Determine current applied offset as % (can be empty string)
     let currentOffset: number =
       parseFloat(overflowContainer.style.left || '0') / 100;
+    //  4. Apply custom offset while staying within limits
     let newOffset: number = Math.min(
       maxOffset,
       Math.max(minOffset, currentOffset + applyOffset)
     );
+
     overflowContainer.style.left = newOffset * 100 + '%';
   };
 
@@ -96,8 +120,8 @@ function FlightsOverview({
       <Transition
         nodeRef={nodeRef}
         in={flightsVisible}
-        timeout={duration}
-        onExited={() => nextStep(true)}
+        timeout={transitionDuration}
+        onExited={nextDashboard}
       >
         {(state: string) => (
           <div
@@ -108,24 +132,29 @@ function FlightsOverview({
               ...transitionStyles[state],
             }}
           >
+            {/* Show previous week */}
             <button
               className="flights-overview-arrow arrow-left"
               onClick={() => moveFlightsOverview(1)}
             >
               <div>➤</div>
             </button>
+            {/* Show next week */}
             <button
               className="flights-overview-arrow arrow-right"
               onClick={() => moveFlightsOverview(-1)}
             >
               <div>➤</div>
             </button>
+            {/* Flights overview */}
             <div className="flights-overview">
               <div
-                id="flights-overview-overflow-container"
+                id={c.ID_FLIGHTS_CONTAINER}
                 className="flights-overview-overflow-container"
               >
-                {/* Date headers */}
+                {/*
+                Date headers
+                */}
                 <ul className="flights-overview-headers">
                   {Object.keys(cheapFlights).map((dayKey, i) => (
                     <li
@@ -144,25 +173,29 @@ function FlightsOverview({
                     </li>
                   ))}
                 </ul>
-                {/* Flight tiles */}
+                {/*
+                Flight tiles
+                */}
                 <ul className="flights-overview-tiles">
                   {Object.keys(cheapFlights).map((dayKey, i) => (
                     <ul
                       key={`list.${dayKey}`}
                       className="flights-overview-tile-column"
                     >
+                      {/* When no flights were found for the date */}
                       {!cheapFlights[dayKey].length && (
                         <div className="flights-overview-no-flights">
                           No flight options found for this date
                         </div>
                       )}
-                      {cheapFlights[dayKey].map((flight, j) => (
+                      {/* Generate flight info tile */}
+                      {cheapFlights[dayKey].map((flight, flightIt) => (
                         <div
                           key={`${dayKey}.${flight.destinationPlaceId}.${flight.price}`}
                           ref={nodeRef}
                           style={{
                             ...defaultStyle,
-                            transitionDelay: j * 0.1 + 's',
+                            transitionDelay: flightIt * 0.1 + 's',
                             ...transitionStyles[state],
                           }}
                         >

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import moment from 'moment';
+
 import * as libFd from '../libraries/flightData.service';
 import { getAirports } from '../services/flightData.service';
-import moment from 'moment';
 
 interface FlightInfoProcessed {
   segments: {

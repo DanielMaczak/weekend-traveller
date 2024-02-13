@@ -388,13 +388,13 @@ main {
   transition: var(--transform-len);
 }
 .arrow-left {
-  margin: 10rem -1.2rem;
+  margin: 5rem -1.2rem;
   transform: scale(-1, 1);
   box-shadow: calc(-1 * var(--shadow-offset)) var(--shadow-offset)
     var(--color-white);
 }
 .arrow-right {
-  margin: 14rem -1.2rem;
+  margin: 9rem -1.2rem;
   box-shadow: var(--shadow-offset) var(--shadow-offset) var(--color-white);
 }
 .flights-overview-arrow > div {
@@ -587,6 +587,7 @@ footer {
 
 @media (max-width: 996px) {
   .nav-mobile {
+    cursor: pointer;
     width: 2.5rem;
     height: 2.5rem;
     display: inline;
@@ -633,7 +634,16 @@ footer {
 
 @media (max-width: 576px) {
   .header-logo h1 {
+    font-size: 3rem;
     line-height: 1;
+  }
+  .flights-loading-container {
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+  }
+  .flights-loading-container * {
+    font-size: 2rem;
   }
   .flights-overview-headers,
   .flights-overview-tiles {

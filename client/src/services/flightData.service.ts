@@ -4,6 +4,7 @@
  * All loaded data is cached to avoid unnecessary duplicated calls.
  * All functions return null on error; this must be handled in caller.
  * @version 1.0.0
+ * @version 1.0.1 Add filtering to postCheapestFlightsRequest
  */
 
 //  Internal dependencies
@@ -103,6 +104,7 @@ export const postLocaleInfoRequest =
 
 /**
  * Loads sorted list of cheapest flights for selected time range.
+ * Ensures each airport is listed only once in each day in output.
  * @param requestBody complete request information
  * @returns object of cheapest flight arrays per day
  */
@@ -124,7 +126,7 @@ export const postCheapestFlightsRequest = async (
     if (!response.ok) throw new Error(response.statusText);
     const data: libFd.CheapestFlights = await response.json();
 
-    //  Filter cheapest option to each location
+    //  Filter cheapest option for each location
     for (let [key, value] of Object.entries(data)) {
       data[key] = value.filter(
         filterEl =>
