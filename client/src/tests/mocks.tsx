@@ -104,6 +104,10 @@ export const flightInfo: libFd.FlightInfo = {
       airlinePic: 'http://test-url.png',
     },
   ],
-  vendorLink: 'http://test-link.html',
-  price: 323.6,
+  links: [
+    {
+      vendorLink: 'http://test-link.html',
+      price: 323.6,
+    },
+  ],
 };
