@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "npx tsc",
-    "start": "node src/index.js",
+    "start": "node dist/src/index.js",
     "dev": "tsx watch src/index.ts"
   },
   "author": "Daniel Maczak",
