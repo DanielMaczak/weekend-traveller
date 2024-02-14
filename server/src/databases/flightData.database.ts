@@ -7,7 +7,6 @@
  */
 
 //  External dependencies
-import * as pg from 'pg';
 import { Options, DataTypes } from 'sequelize';
 import { Sequelize, Model, Column, Table } from 'sequelize-typescript';
 
@@ -18,7 +17,6 @@ const dbInfo: Options = {
   host: process.env.DB_URL,
   port: process.env.DB_PORT,
   dialect: 'postgres',
-  dialectModule: pg,
 };
 
 const sequelize: Sequelize = new Sequelize(dbInfo);
