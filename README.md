@@ -1,9 +1,13 @@
 # Weekend Traveller
 
-Simple one-page app to see flights from any airport to all other connected reports, sorted by price.
-Ideal when planning weekend trips or summar vacation abroad and you are not sure when exactly or where to.
+One-page web application to search for the cheapest flights from any airport to all other connected reports.
+Ideal when planning weekend trips or summer vacation abroad when not sure when exactly or where do you want to go.
 
-![image](https://github.com/DanielMaczak/weekend-traveller/assets/145442574/ae2eb114-aed9-4147-93d0-dbcf4ad4c0ff)
+This project is in development so some parts still require polishing.
+
+![image](https://github.com/DanielMaczak/weekend-traveller/assets/145442574/9ad86165-0c7f-4e9f-ab7c-b9dcab212734)
+
+![image](https://github.com/DanielMaczak/weekend-traveller/assets/145442574/73cf28f6-2749-47ba-96f2-a1cc9b47ef07)
 
 ### Server features
 
@@ -14,9 +18,10 @@ Ideal when planning weekend trips or summar vacation abroad and you are not sure
 
 ### Client features
 
-1. Centralized constants
-2. Loaded results are cached to avoid duplicate API calls
-3. Unit and integration tests
+1. Fully responsive
+2. Beautiful transitions between screens
+3. Loaded results are cached to avoid duplicate API calls
+4. Unit and integration tests (need revision)
 
 ## Getting started
 
