@@ -145,16 +145,17 @@ function FlightOptions({
     }
 
     //  Componse request body
+    const startDateWithoutTime: Date = new Date(startDate.toDateString());
     const requestBody: libFd.CheapestFlightsRequest = {
       currencyCode: localeInfo.currencyCode,
       localeCode: localeInfo.localeCode,
       marketCode: localeInfo.marketCode,
       originPlaceId: pickedAirport.value,
       lookAtWeeks: Number(showWeeks.value),
-      travelDate: startDate.valueOf(),
+      travelDate: startDateWithoutTime.valueOf(),
     };
     if (tripLength.value !== c.OPTION_ONE_WAY.value) {
-      requestBody.returnDate = startDate.valueOf();
+      requestBody.returnDate = startDateWithoutTime.valueOf();
       requestBody.returnDate += 1000 * 3600 * 24 * Number(tripLength.value);
     }
     composeRequest(requestBody);

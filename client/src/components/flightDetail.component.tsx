@@ -17,16 +17,7 @@ import { getAirports } from '../services/flightData.service';
  * @returns converted datetime
  */
 const getTimeLocal = (time: number): Moment => {
-  return moment(time).utc();
-};
-
-/**
- * Returns days since begining of time in JS.
- * @param time time object from moment lib
- * @returns number of days
- */
-const getDayOfEpoch = (time: Moment): number => {
-  return Math.floor(time.valueOf() / 86400000);
+  return moment.utc(time);
 };
 
 /**
@@ -71,12 +62,8 @@ function FlightDetail({
         if (!airports) return; // already checked in flight options
 
         //  Calculate start dates for travel there and back
-        const travelDay: number = getDayOfEpoch(
-          getTimeLocal(requestBody.travelDate)
-        );
-        const returnDay: number = getDayOfEpoch(
-          getTimeLocal(requestBody.returnDate ?? 0)
-        );
+        const travelDay: Moment = getTimeLocal(requestBody.travelDate);
+        const returnDay: Moment = getTimeLocal(requestBody.returnDate ?? 0);
 
         //  Obtain airport and overnight travel info
         flightData.segments.forEach(segment => {
@@ -97,12 +84,22 @@ function FlightDetail({
             departure: getTimeLocal(segment.departure).format('HH:mm'),
             arrival: getTimeLocal(segment.arrival).format('HH:mm'),
             //  Extra days for overnight travel
-            departureAddDays:
-              getDayOfEpoch(getTimeLocal(segment.departure)) -
-              (isReturnSegment ? returnDay : travelDay),
-            arrivalAddDays:
-              getDayOfEpoch(getTimeLocal(segment.arrival)) -
-              (isReturnSegment ? returnDay : travelDay),
+            //  There is a bug related to this information.
+            //  Even though I explicitely load the values as UTC,
+            //  JavaScript (moment.js) always reads it as local
+            //  and calculates the days based on local timezone.
+            //  I need to work without timezones because the data come
+            //  with date relative to its location.
+            //  As of now I have no clue how to fix it
+            //  because the time is already compromised when loaded...
+            departureAddDays: getTimeLocal(segment.departure).diff(
+              isReturnSegment ? returnDay : travelDay,
+              'days'
+            ),
+            arrivalAddDays: getTimeLocal(segment.arrival).diff(
+              isReturnSegment ? returnDay : travelDay,
+              'days'
+            ),
             isReturnTrip: isReturnSegment,
           });
         });

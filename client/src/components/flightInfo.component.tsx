@@ -81,6 +81,7 @@ function FlightInfo({
   if (returnDate) {
     flightInfoRequest.returnDate = returnDate;
   }
+
   const getFlightDetail = () => {
     showDetails(!detailsVisible);
     if (flightData) return;
