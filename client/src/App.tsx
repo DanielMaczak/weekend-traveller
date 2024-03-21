@@ -7,8 +7,10 @@
 
 //  External dependencies
 import 'react-datepicker/dist/react-datepicker.css';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import React, { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 //  Internal dependencies
 import * as libFd from './libraries/flightData.service';
@@ -17,6 +19,9 @@ import { postLocaleInfoRequest } from './services/flightData.service';
 import Header from './components/header.component';
 import FlightsDashboard from './components/flightsDashboard.component';
 import Footer from './components/footer.component';
+
+//  CSS overloads
+import './components/reactToastify.css';
 
 //  Locale info is present in majority of API requests anywhere in app
 const defaultLocaleInfo: libFd.LocaleInfo = {
@@ -43,6 +48,7 @@ function App() {
         <FlightsDashboard />
         <Footer />
       </AppContext>
+      <ToastContainer />
     </>
   );
 }

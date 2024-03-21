@@ -120,6 +120,12 @@ function FlightDetail({
           {/* //  List individual flights */}
           {flightInfo?.segments.map(segment => (
             <div
+              key={
+                segment.originAirport +
+                segment.departure +
+                segment.destinationAirport +
+                segment.arrival
+              }
               className={
                 'flight-tile-segment' +
                 (segment.isReturnTrip ? ' flight-tile-return' : '')
@@ -161,7 +167,12 @@ function FlightDetail({
           ))}
           {/* //  Final price and link to vendor(s) */}
           {flightInfo?.links.map((link, i) => (
-            <a target="_blank" rel="noreferrer" href={link.vendorLink}>
+            <a
+              key={link.vendorLink}
+              target="_blank"
+              rel="noreferrer"
+              href={link.vendorLink}
+            >
               <div
                 className={
                   'flight-tile-final-price' +

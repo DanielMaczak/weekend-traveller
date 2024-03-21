@@ -14,6 +14,7 @@ import Home from './home.component';
 import * as libFd from '../libraries/flightData.service';
 import * as c from '../services/const.service';
 import { postCheapestFlightsRequest } from '../services/flightData.service';
+import { notifyError } from '../services/notification.service';
 
 /**
  * @module
@@ -105,7 +106,7 @@ function FlightsDashboard() {
         const finishLoading: number = Date.now() + c.CSS_MIN_LOADING_DURATION;
         postCheapestFlightsRequest(requestBody).then(data => {
           if (!data) {
-            alert(
+            notifyError(
               `We couldn't load the flight information. ` +
                 `Please try again later.`
             );

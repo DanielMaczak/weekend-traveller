@@ -14,6 +14,7 @@ import { LocaleContext } from '../App';
 import * as libFd from '../libraries/flightData.service';
 import * as c from '../services/const.service';
 import { getAirports } from '../services/flightData.service';
+import { notifyError, notifyInfo } from '../services/notification.service';
 
 //  CSS overloads
 import './reactDatePicker.css';
@@ -65,7 +66,7 @@ async function loadOptions(search: string, loadedOptions: any) {
     search
   );
   if (!partition) {
-    alert(
+    notifyError(
       `We couldn't load the airports list. ` +
         `The app will not function properly. Please try again later.`
     );
@@ -119,27 +120,27 @@ function FlightOptions({
 
     //  Check request inputs
     if (!pickedAirport) {
-      alert(`Please select an airport.`);
+      notifyInfo(`Please select an airport.`);
       return;
     }
     if (!localeInfo.currencyCode) {
-      alert('Please select one of valid Currency options.');
+      notifyInfo('Please select one of valid Currency options.');
       return;
     }
     if (!startDate || startDate.valueOf() < c.OPTION_START_DATE_DEF.valueOf()) {
-      alert(`Please select a valid future date.`);
+      notifyInfo(`Please select a valid future date.`);
       return;
     }
     if (
       !c.OPTIONS_TRIP_LENGTH.find(option => option.value === tripLength.value)
     ) {
-      alert(`Please select one of valid Return options.`);
+      notifyInfo(`Please select one of valid Return options.`);
       return;
     }
     if (
       !c.OPTIONS_SHOW_WEEKS.find(option => option.value === showWeeks.value)
     ) {
-      alert(`Please select one of valid Show options.`);
+      notifyInfo(`Please select one of valid Show options.`);
       return;
     }
 
@@ -177,7 +178,7 @@ function FlightOptions({
       c.ID_NAV_BUTTON
     );
     if (!navMenu || !navButton) {
-      alert(
+      notifyError(
         `Application has some issues. ` +
           `We apologize for the inconvenience. Please try again later.`
       );

@@ -1,0 +1,16 @@
+/* For: react-toastify
+   Ensure font style is in line with rest of page.
+*/
+
+/* Entire control */
+
+.Toastify > * {
+  /* Make sure entire control inherits */
+  color: inherit;
+}
+.Toastify > div * {
+  color: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  font-size: 0.9rem;
+}

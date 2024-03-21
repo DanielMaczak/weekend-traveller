@@ -13,6 +13,7 @@ import {
   postFlightInfoRequest,
 } from '../services/flightData.service';
 import FlightDetail from './flightDetail.component';
+import { notifyError } from '../services/notification.service';
 
 //  Transition setup
 const transitionDuration = 500; // ms
@@ -85,7 +86,9 @@ function FlightInfo({
     if (flightData) return;
     postFlightInfoRequest(flightInfoRequest).then(data => {
       if (!data) {
-        alert(`Couldn't load data for this flight. Please try again later.`);
+        notifyError(
+          `Couldn't load data for this flight. Please try again later.`
+        );
         showDetails(false);
         return;
       }

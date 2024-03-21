@@ -11,6 +11,7 @@ import Select, { SingleValue } from 'react-select';
 import { LocaleContext } from '../App';
 import * as libFd from '../libraries/flightData.service';
 import { getCurrencies } from '../services/flightData.service';
+import { notifyError } from '../services/notification.service';
 
 /**
  * @module
@@ -28,7 +29,7 @@ function Header() {
   useEffect(() => {
     getCurrencies().then(response => {
       if (!response) {
-        alert(
+        notifyError(
           `We couldn't load the currency list. ` +
             `The app will not function properly. Please try again later.`
         );
