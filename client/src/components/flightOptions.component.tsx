@@ -184,6 +184,9 @@ function FlightOptions({
       return;
     }
 
+    //  Leave if not on mobile
+    if (!navButton.checkVisibility()) return;
+
     //  Update menu position and menu button icon
     if (mobileNavVisible) {
       navMenu.style.top = '0';

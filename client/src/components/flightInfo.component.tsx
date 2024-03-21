@@ -86,7 +86,7 @@ function FlightInfo({
     postFlightInfoRequest(flightInfoRequest).then(data => {
       if (!data) {
         alert(`Couldn't load data for this flight. Please try again later.`);
-        if (detailsVisible) showDetails(!detailsVisible);
+        showDetails(false);
         return;
       }
       setFlightData(data);
