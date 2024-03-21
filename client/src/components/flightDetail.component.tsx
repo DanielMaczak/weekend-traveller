@@ -1,25 +1,40 @@
-import { useEffect, useState } from 'react';
-import moment from 'moment';
+/**
+ * @version 1.0.0
+ */
 
+//  External dependencies
+import { useEffect, useState } from 'react';
+import moment, { Moment } from 'moment';
+
+//  Internal dependencies
 import * as libFd from '../libraries/flightData.service';
 import { getAirports } from '../services/flightData.service';
 
-interface FlightInfoProcessed {
-  segments: {
-    originAirport: string;
-    destinationAirport: string;
-    departure: string;
-    arrival: string;
-    departureAddDays: number;
-    arrivalAddDays: number;
-    isReturnTrip: boolean;
-  }[];
-  links: {
-    vendorLink: string;
-    price: number;
-  }[];
-}
+/**
+ * Converts datetime from API to user's local.
+ * @param time datetime to convert
+ * @returns converted datetime
+ */
+const getTimeLocal = (time: number): Moment => {
+  return moment(time).utc();
+};
 
+/**
+ * Returns days since begining of time in JS.
+ * @param time time object from moment lib
+ * @returns number of days
+ */
+const getDayOfEpoch = (time: Moment): number => {
+  return Math.floor(time.valueOf() / 86400000);
+};
+
+/**
+ * @module
+ * Table containing single flight details with accurate price.
+ * Provides link to vendor page.
+ * @param flightData destination, price etc.
+ * @param requestBody request generating flightInfo with additional info
+ */
 function FlightDetail({
   flightData,
   requestBody,
@@ -27,33 +42,36 @@ function FlightDetail({
   flightData: libFd.FlightInfo | undefined;
   requestBody: libFd.FlightInfoRequest;
 }) {
-  const [flightInfo, setFlightInfo] = useState<FlightInfoProcessed>();
+  //  State hooks
+  const [flightInfo, setFlightInfo] = useState<libFd.FlightInfoProcessed>();
 
-  const getTimeLocal = (time: number) => {
-    return moment(time).utc();
-  };
-
+  //  Data load hooks
   useEffect(() => {
     if (flightData) {
-      let flightDataProcessed: FlightInfoProcessed = {
+      //  Initialize processed data object
+      let flightDataProcessed: libFd.FlightInfoProcessed = {
         segments: [],
         links: flightData.links,
       };
-
       getAirports().then(airports => {
         if (!airports) return; // already checked in flight options
-        const travelDay: number = getTimeLocal(
-          requestBody.travelDate
-        ).dayOfYear();
-        const returnDay: number = getTimeLocal(
-          requestBody.returnDate ?? 0
-        ).dayOfYear();
+
+        //  Calculate start dates for travel there and back
+        const travelDay: number = getDayOfEpoch(
+          getTimeLocal(requestBody.travelDate)
+        );
+        const returnDay: number = getDayOfEpoch(
+          getTimeLocal(requestBody.returnDate ?? 0)
+        );
+
+        //  Obtain airport and overnight travel info
         flightData.segments.forEach(segment => {
           const isReturnSegment: boolean = Boolean(
             requestBody.returnDate &&
               segment.departure >= requestBody.returnDate
           );
           flightDataProcessed.segments.push({
+            //  Airport names
             originAirport:
               airports.find(airport => airport.value === segment.originPlaceId)
                 ?.label ?? 'Unknown airport',
@@ -61,17 +79,21 @@ function FlightDetail({
               airports.find(
                 airport => airport.value === segment.destinationPlaceId
               )?.label ?? 'Unknown airport',
+            //  Time of flight
             departure: getTimeLocal(segment.departure).format('HH:mm'),
             arrival: getTimeLocal(segment.arrival).format('HH:mm'),
+            //  Extra days for overnight travel
             departureAddDays:
-              getTimeLocal(segment.departure).dayOfYear() -
+              getDayOfEpoch(getTimeLocal(segment.departure)) -
               (isReturnSegment ? returnDay : travelDay),
             arrivalAddDays:
-              getTimeLocal(segment.arrival).dayOfYear() -
+              getDayOfEpoch(getTimeLocal(segment.arrival)) -
               (isReturnSegment ? returnDay : travelDay),
             isReturnTrip: isReturnSegment,
           });
         });
+
+        //  Assign final object
         setFlightInfo(flightDataProcessed);
       });
     }
@@ -81,6 +103,7 @@ function FlightDetail({
     <>
       {flightInfo ? (
         <>
+          {/* //  List individual flights */}
           {flightInfo?.segments.map(segment => (
             <div
               className={
@@ -88,6 +111,7 @@ function FlightDetail({
                 (segment.isReturnTrip ? ' flight-tile-return' : '')
               }
             >
+              {/* //  Departure airport and time */}
               <p className="flight-tile-segment-info">
                 <span className="flight-tile-segment-airport">
                   {segment.originAirport}
@@ -103,6 +127,7 @@ function FlightDetail({
                   {segment.departure}
                 </span>
               </p>
+              {/* //  Arrival airport and time */}
               <p className="flight-tile-segment-info">
                 <span className="flight-tile-segment-airport">
                   {segment.destinationAirport}
@@ -120,6 +145,7 @@ function FlightDetail({
               </p>
             </div>
           ))}
+          {/* //  Final price and link to vendor(s) */}
           {flightInfo?.links.map((link, i) => (
             <a target="_blank" rel="noreferrer" href={link.vendorLink}>
               <div className="flight-tile-final-price">

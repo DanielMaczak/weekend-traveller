@@ -70,3 +70,18 @@ export interface FlightInfo {
     price: number;
   }[];
 }
+export interface FlightInfoProcessed {
+  segments: {
+    originAirport: string;
+    destinationAirport: string;
+    departure: string;
+    arrival: string;
+    departureAddDays: number;
+    arrivalAddDays: number;
+    isReturnTrip: boolean;
+  }[];
+  links: {
+    vendorLink: string;
+    price: number;
+  }[];
+}

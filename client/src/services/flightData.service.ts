@@ -5,6 +5,7 @@
  * All functions return null on error; this must be handled in caller.
  * @version 1.0.0
  * @version 1.0.1 Add filtering to postCheapestFlightsRequest
+ * @version 1.0.2 Fix duplicate calls of getCurrencies API
  */
 
 //  Internal dependencies

@@ -31,8 +31,6 @@ const transitionStyles: { [key: string]: {} } = {
  * @module
  * Single flight tile with flight info.
  * On click it should query API for flight details.
- * The query code is in place on both ends but this feature
- * probably won't make it due to time constraints.
  * @param flightInfo destination, price etc.
  * @param requestBody request generating flightInfo with additional info
  * @param flightDate date of flight
