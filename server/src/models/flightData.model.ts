@@ -8,6 +8,9 @@
  * @version 1.0.0
  */
 
+//  External dependencies
+import validator from 'validator';
+
 //  Internal dependencies
 import { errors } from '../middleware/errorHandler.js';
 import * as api from '../api/skyscanner.api.js';
@@ -81,6 +84,7 @@ export const getAirports = async (
 
 /**
  * Provides info about user's language and location based on their IP.
+ * Data coming from request body are sanitized.
  * @param ipAddress IP of user
  * @returns shallow object with user locale info
  * @throws if no data is provided or in unexpected format
@@ -89,6 +93,7 @@ export const postLocaleInfoRequest = async (
   ipAddress: string
 ): Promise<libFd.LocaleInfo> => {
   //  Check inputs
+  ipAddress = validator.whitelist(ipAddress, '1234567890.');
   if (!ipFilter.test(ipAddress))
     throw new errors.BadRequest('Incorrect user input.');
 
@@ -113,6 +118,7 @@ export const postLocaleInfoRequest = async (
  * Converts information from requestBody param into object expected by API.
  * Request body contains information to calculate travelDate and returnDate
  * but they are used in multiple places so they come from parent.
+ * Data coming from request body are sanitized.
  * @param requestBody contains inputs from user to query API
  * @param travelDate date of flight to destination
  * @param returnDate date of return flight
@@ -139,14 +145,14 @@ const createRequestBodyApiCheapestFlight = (
   //  Generate request object
   const requestBodyApi: libApi.FlightsIndicativeRequest = {
     query: {
-      currency: requestBody.currencyCode,
-      locale: requestBody.localeCode,
-      market: requestBody.marketCode,
+      currency: validator.whitelist(requestBody.currencyCode, 'A-Z'),
+      locale: validator.whitelist(requestBody.localeCode, 'a-zA-Z-'),
+      market: validator.whitelist(requestBody.marketCode, 'A-Z'),
       queryLegs: [
         {
           originPlace: {
             queryPlace: {
-              entityId: requestBody.originPlaceId,
+              entityId: validator.whitelist(requestBody.originPlaceId, '0-9'),
             },
           },
           destinationPlace: {
@@ -171,7 +177,7 @@ const createRequestBodyApiCheapestFlight = (
       },
       destinationPlace: {
         queryPlace: {
-          entityId: requestBody.originPlaceId,
+          entityId: validator.whitelist(requestBody.originPlaceId, '0-9'),
         },
       },
       fixedDate: {
@@ -189,6 +195,7 @@ const createRequestBodyApiCheapestFlight = (
  * for set of dates defined by requestBody.
  * Dates are calculated from initial travelDate per week for #X weeks.
  * Data from API is sort by price for convenience.
+ * Data coming from request body are sanitized.
  * @param requestBody info necessary to compose API request
  * @returns array of flight objects by date sorted from cheapest
  * @throws if travel/return dates are not consecutive
@@ -200,6 +207,11 @@ export const postCheapestFlightsRequest = async (
   //  Check inputs
   if (!(requestBody instanceof Object))
     throw new errors.BadRequest('Incorrect user input.');
+  requestBody.lookAtWeeks = validator.toInt(requestBody.lookAtWeeks.toString());
+  requestBody.travelDate = validator.toInt(requestBody.travelDate.toString());
+  if (requestBody.returnDate) {
+    requestBody.returnDate = validator.toInt(requestBody.returnDate.toString());
+  }
 
   //  Obtain data for each requested week
   const dataProc: libFd.CheapestFlights = {};
@@ -266,6 +278,7 @@ export const postCheapestFlightsRequest = async (
  * Converts information from requestBody param into object expected by API.
  * Request body contains information to calculate travelDate and returnDate
  * but they are kept in parent for compliance with othe request processes.
+ * Data coming from request body are sanitized.
  * @param requestBody contains inputs from user to query API
  * @param travelDate date of flight to destination
  * @param returnDate date of return flight
@@ -292,16 +305,19 @@ const createRequestBodyApiFlightInfo = (
   //  Generate request object
   const requestBodyApi: libApi.FlightsLivePricesRequest = {
     query: {
-      currency: requestBody.currencyCode,
-      locale: requestBody.localeCode,
-      market: requestBody.marketCode,
+      currency: validator.whitelist(requestBody.currencyCode, 'A-Z'),
+      locale: validator.whitelist(requestBody.localeCode, 'a-zA-Z-'),
+      market: validator.whitelist(requestBody.marketCode, 'A-Z'),
       queryLegs: [
         {
           originPlaceId: {
-            entityId: requestBody.originPlaceId,
+            entityId: validator.whitelist(requestBody.originPlaceId, '0-9'),
           },
           destinationPlaceId: {
-            entityId: requestBody.destinationPlaceId,
+            entityId: validator.whitelist(
+              requestBody.destinationPlaceId,
+              '0-9'
+            ),
           },
           date: {
             year: travelDate.getFullYear(),
@@ -319,10 +335,10 @@ const createRequestBodyApiFlightInfo = (
   if (returnDate) {
     requestBodyApi.query.queryLegs.push({
       originPlaceId: {
-        entityId: requestBody.destinationPlaceId,
+        entityId: validator.whitelist(requestBody.destinationPlaceId, '0-9'),
       },
       destinationPlaceId: {
-        entityId: requestBody.originPlaceId,
+        entityId: validator.whitelist(requestBody.originPlaceId, '0-9'),
       },
       date: {
         year: returnDate.getFullYear(),
@@ -337,6 +353,7 @@ const createRequestBodyApiFlightInfo = (
 /**
  * Requests flights between 2 locations for specific date.
  * Return flight can be part of request.
+ * Data coming from request body are sanitized.
  * @param requestBody info necessary to compose API request
  * @returns info of cheapest flight option
  * @throws if travel/return dates are not consecutive
@@ -348,6 +365,10 @@ export const postFlightInfoRequest = async (
   //  Check inputs
   if (!(requestBody instanceof Object))
     throw new errors.BadRequest('Incorrect user input.');
+  requestBody.travelDate = validator.toInt(requestBody.travelDate.toString());
+  if (requestBody.returnDate) {
+    requestBody.returnDate = validator.toInt(requestBody.returnDate.toString());
+  }
 
   //  Generate date objects
   const travelDate: Date = new Date(requestBody.travelDate);
