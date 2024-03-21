@@ -84,4 +84,5 @@ export interface FlightInfoProcessed {
     vendorLink: string;
     price: number;
   }[];
+  significantPriceChange: boolean;
 }

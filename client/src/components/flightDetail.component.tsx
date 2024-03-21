@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import moment, { Moment } from 'moment';
 
 //  Internal dependencies
+import * as c from '../services/const.service';
 import * as libFd from '../libraries/flightData.service';
 import { getAirports } from '../services/flightData.service';
 
@@ -32,14 +33,20 @@ const getDayOfEpoch = (time: Moment): number => {
  * @module
  * Table containing single flight details with accurate price.
  * Provides link to vendor page.
+ * Price from flightData sometimes significantly diverges from indicated.
+ * ALl cases I checked so far were correctly requested and processed,
+ * but there might be error in back-end (assuming external API is correct).
  * @param flightData destination, price etc.
+ * @param indicatedFlightPrice for comparison with final price
  * @param requestBody request generating flightInfo with additional info
  */
 function FlightDetail({
   flightData,
+  indicatedFlightPrice,
   requestBody,
 }: {
   flightData: libFd.FlightInfo | undefined;
+  indicatedFlightPrice: number;
   requestBody: libFd.FlightInfoRequest;
 }) {
   //  State hooks
@@ -49,10 +56,17 @@ function FlightDetail({
   useEffect(() => {
     if (flightData) {
       //  Initialize processed data object
+      const finalFlightPrice: number = flightData.links.reduce(
+        (totalPrice, link) => totalPrice + link.price,
+        0
+      );
       let flightDataProcessed: libFd.FlightInfoProcessed = {
         segments: [],
         links: flightData.links,
+        significantPriceChange:
+          finalFlightPrice / indicatedFlightPrice >= c.PRICE_CHANGE_THRESHOLD,
       };
+
       getAirports().then(airports => {
         if (!airports) return; // already checked in flight options
 
@@ -148,7 +162,14 @@ function FlightDetail({
           {/* //  Final price and link to vendor(s) */}
           {flightInfo?.links.map((link, i) => (
             <a target="_blank" rel="noreferrer" href={link.vendorLink}>
-              <div className="flight-tile-final-price">
+              <div
+                className={
+                  'flight-tile-final-price' +
+                  (flightInfo.significantPriceChange
+                    ? ' flight-tile-price-change'
+                    : '')
+                }
+              >
                 {flightInfo?.links.length > 1 ? (
                   <span>{`Visit vendor ${i + 1}:`}</span>
                 ) : (

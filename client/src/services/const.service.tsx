@@ -38,6 +38,12 @@ export const CSS_SCREEN_WIDTH_TABLET: number = 996;
 export const CSS_MIN_LOADING_DURATION: number = 2000;
 
 /**
+ * Website calculations constants
+ * @constant PRICE_CHANGE_THRESHOLD max acceptable % of price change from indicated
+ */
+export const PRICE_CHANGE_THRESHOLD: number = 1.2;
+
+/**
  * Request options
  * @constant GLOBAL_LOCALE decided to ignore user's locale due to time constraint
  * @constant OPTIONS_SHOW_WEEKS weeks to display, value MUST be a number

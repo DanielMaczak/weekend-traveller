@@ -142,6 +142,7 @@ function FlightInfo({
               >
                 <FlightDetail
                   flightData={flightData}
+                  indicatedFlightPrice={flightInfo.price}
                   requestBody={flightInfoRequest}
                 />
               </div>
