@@ -12,7 +12,6 @@ import * as libFd from '../libraries/flightData.service';
 import * as c from './const.service';
 
 //  Data cache
-let currencies: libFd.Currencies = [];
 let airports: libFd.Airports;
 let localeInfo: libFd.LocaleInfo;
 let cheapestFlightsCache: { [key: string]: libFd.CheapestFlights } = {};
@@ -21,25 +20,31 @@ let flightInfoCache: { [key: string]: libFd.FlightInfo } = {};
 /**
  * Loads list of currency codes.
  * List is transformed to fit Option format required by react-select.
+ * Currencies are stored in closure to ensure they load only once
+ * during fast initial rerenders (which I couldn't avoid).
  * @returns list of currency codes
  */
-export const getCurrencies = async (): Promise<libFd.Currencies | null> => {
-  try {
-    //  Check cache
-    if (currencies && currencies.length) return currencies;
-
-    //  Not cached yet, request data
-    const response = await fetch(`${c.SERVER_URL}/currencies`);
-    if (!response.ok) throw new Error(response.statusText);
-    const data: string[] = await response.json();
-
-    //  Transform data and update cache
-    currencies = data.map(currency => ({ value: currency, label: currency }));
+const getCurrenciesOnce = (): (() => Promise<libFd.Currencies | null>) => {
+  //  Load currency list into closure
+  const getCurrencies = async (): Promise<libFd.Currencies | null> => {
+    try {
+      //  Request data
+      const response = await fetch(`${c.SERVER_URL}/currencies`);
+      if (!response.ok) throw new Error(response.statusText);
+      const data: string[] = await response.json();
+      //  Transform data and update cache
+      return data.map(currency => ({ value: currency, label: currency }));
+    } catch (err) {
+      return null;
+    }
+  };
+  const currencies = getCurrencies();
+  //  Return as promise
+  return async (): Promise<libFd.Currencies | null> => {
     return currencies;
-  } catch (err) {
-    return null;
-  }
+  };
 };
+export const getCurrencies = getCurrenciesOnce();
 
 /**
  * Loads list of airport IDs and names.
