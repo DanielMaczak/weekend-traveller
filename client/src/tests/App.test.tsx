@@ -14,7 +14,6 @@ import App from '../App';
 import * as mocks from './mocks';
 import * as c from '../services/const.service';
 import * as notifications from '../services/notification.service';
-
 import moment from 'moment';
 
 //  Key code constants
@@ -316,7 +315,7 @@ describe('Flight overview component', () => {
     await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
     expect(alertMock).toHaveBeenCalledTimes(0);
     expect(welcome).not.toBeInTheDocument();
-    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
+    await act(() => vi.advanceTimersByTime(5000)); // skip loading animation
     await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
 
     //  Check displayed data
@@ -335,7 +334,6 @@ describe('Flight overview component', () => {
           style: 'currency',
           currency: mocks.localeInfo.currencyCode,
         });
-
         //  Search for tile with matching information
         const tiles = screen.getAllByText(destination);
         let tileFound: boolean = false;
@@ -351,5 +349,51 @@ describe('Flight overview component', () => {
         expect(tileFound).toBeTruthy();
       }
     }
+  });
+
+  it('should show flight details on click', async () => {
+    //  Complete flight search
+    await act(() => fireEvent.keyDown(airports, { keyCode: KEY_DOWN_ARROW }));
+    const airport1 = screen.getByText(mocks.airports[1].label); // Heathrow
+    await fireEvent.click(airport1);
+    await act(() => fireEvent.click(searchButton));
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
+    await act(() => vi.advanceTimersByTime(5000)); // skip loading animation
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
+
+    //  Access flight tile
+    const destination = mocks.airports[0]?.label; // Berlin
+    const foundDestinations = screen.getAllByText(destination);
+    expect(foundDestinations.length).toBeGreaterThanOrEqual(0);
+    const firstTileDestination = foundDestinations[0];
+    const firstTileHeader = firstTileDestination.parentElement;
+    expect(firstTileHeader).toBeTruthy();
+    const firstTile = firstTileHeader?.parentElement;
+    expect(firstTile).toBeTruthy();
+
+    //  Assess expected information
+    const links = mocks.flightInfo.links[0];
+    const segments = mocks.flightInfo.segments[0];
+    const origin = mocks.airports[1].label; // airport1
+    //  + destination is already defined
+    const price = links.price.toLocaleString(mocks.localeInfo.localeCode, {
+      style: 'currency',
+      currency: mocks.localeInfo.currencyCode,
+    });
+    const link = links.vendorLink;
+    const departure = moment.utc(segments.departure).format('HH:mm');
+    const arrival = moment.utc(segments.arrival).format('HH:mm');
+    const addDays = (segments.arrival - segments.departure) / 1000 / 3600 / 24;
+
+    //  Load flight info
+    await act(() => fireEvent.click(firstTileDestination));
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
+    expect(firstTile).toHaveTextContent(origin);
+    expect(firstTile).toHaveTextContent(destination);
+    expect(firstTile).toHaveTextContent(departure);
+    expect(firstTile).toHaveTextContent(arrival);
+    expect(firstTile).toHaveTextContent('+' + addDays);
+    expect(firstTile).toHaveTextContent(price);
+    expect(firstTile).toContainHTML(`href="${link}"`);
   });
 });

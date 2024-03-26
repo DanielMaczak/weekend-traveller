@@ -103,8 +103,8 @@ export const flightInfo: libFd.FlightInfo = {
     {
       originPlaceId: '95565050',
       destinationPlaceId: '95673383',
-      departure: tomorrow + 1000 * 3600 * 4,
-      arrival: tomorrow + 1000 * 3600 * 6.5,
+      departure: tomorrow,
+      arrival: tomorrow + 1000 * 3600 * 24,
       airlinePic: 'http://test-url.png',
     },
   ],
