@@ -13,6 +13,8 @@ import { MockInstance, vi } from 'vitest';
 import App from '../App';
 import * as mocks from './mocks';
 import * as c from '../services/const.service';
+import * as notifications from '../services/notification.service';
+
 import moment from 'moment';
 
 //  Key code constants
@@ -67,7 +69,7 @@ describe('App component', () => {
   });
 
   it('should render the Welcome message', async () => {
-    const welcome = screen.getByText('Welcome to Weekend Traveller');
+    const welcome = screen.getByText(mocks.homepage);
     expect(welcome).toBeInTheDocument();
   });
 });
@@ -131,6 +133,7 @@ describe('Flight options component', () => {
   let searchButton: HTMLElement;
   let alertMock: MockInstance;
   beforeEach(() => {
+    vi.useFakeTimers();
     airportsLabel = screen.getByText('From:');
     airports = airportsLabel.nextSibling as HTMLElement;
     airportsInput = getFirstInput(airports);
@@ -142,7 +145,9 @@ describe('Flight options component', () => {
     showWeeksLabel = screen.getByText('Show:');
     showWeeks = showWeeksLabel.nextSibling as HTMLElement;
     searchButton = screen.getByText('🔎︎');
-    alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    alertMock = vi
+      .spyOn(notifications, 'notifyInfo')
+      .mockImplementation(() => {});
   });
 
   //  Airport selection
@@ -266,9 +271,9 @@ describe('Flight options component', () => {
 
   it('should show selected show option in dropdown on click', async () => {
     await act(() => fireEvent.keyDown(showWeeks, { keyCode: KEY_DOWN_ARROW }));
-    const option3 = screen.getByText(c.OPTIONS_SHOW_WEEKS[3].label); // 8
+    const option3 = screen.getByText(c.OPTIONS_SHOW_WEEKS[2].label); // 8
     await fireEvent.click(option3);
-    expect(showWeeks?.textContent).toEqual(c.OPTIONS_SHOW_WEEKS[3].label);
+    expect(showWeeks?.textContent).toEqual(c.OPTIONS_SHOW_WEEKS[2].label);
   });
 
   //  Search button
@@ -286,34 +291,33 @@ describe('Flight options component', () => {
 describe('Flight overview component', () => {
   let airportsLabel: HTMLElement;
   let airports: HTMLElement;
-  let showWeeksLabel: HTMLElement;
-  let showWeeks: HTMLElement;
   let searchButton: HTMLElement;
   let alertMock: MockInstance;
   beforeEach(() => {
+    vi.useFakeTimers();
     airportsLabel = screen.getByText('From:');
     airports = airportsLabel.nextSibling as HTMLElement;
-    showWeeksLabel = screen.getByText('Show:');
-    showWeeks = showWeeksLabel.nextSibling as HTMLElement;
     searchButton = screen.getByText('🔎︎');
-    alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    alertMock = vi
+      .spyOn(notifications, 'notifyInfo')
+      .mockImplementation(() => {});
   });
 
   it('should show query results on search', async () => {
     //  Check for homepage
-    const welcome = screen.getByText('Welcome to Weekend Traveller');
+    const welcome = screen.getByText(mocks.homepage);
     expect(welcome).toBeInTheDocument();
 
     //  Complete flight search
     await act(() => fireEvent.keyDown(airports, { keyCode: KEY_DOWN_ARROW }));
     const airport1 = screen.getByText(mocks.airports[1].label); // Heathrow
     await fireEvent.click(airport1);
-    await act(() => fireEvent.keyDown(showWeeks, { keyCode: KEY_DOWN_ARROW }));
-    const showWeeks0 = screen.getByText(c.OPTIONS_SHOW_WEEKS[0].label); // 2
-    await fireEvent.click(showWeeks0);
     await act(() => fireEvent.click(searchButton));
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
     expect(alertMock).toHaveBeenCalledTimes(0);
     expect(welcome).not.toBeInTheDocument();
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
+    await act(() => vi.advanceTimersByTime(5000)); // skip page transitions
 
     //  Check displayed data
     for (let [day, flights] of Object.entries(mocks.cheapestFlights)) {
@@ -338,7 +342,7 @@ describe('Flight overview component', () => {
         for (let tile of tiles) {
           if (
             tile.parentElement?.textContent ===
-            destination + transfer + price
+            destination + transfer + '~ ' + price
           ) {
             tileFound = true;
             break;

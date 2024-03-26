@@ -187,7 +187,11 @@ function FlightOptions({
     }
 
     //  Leave if not on mobile
-    if (!navButton.checkVisibility()) return;
+    const screenWidth: number =
+      document.body.clientWidth * window.devicePixelRatio;
+    if (screenWidth > c.CSS_SCREEN_WIDTH_TABLET) return;
+    //  I wanted to use !navButton.checkVisibility()
+    //  but it doesn't seem to be supported by... Jest.
 
     //  Update menu position and menu button icon
     if (mobileNavVisible) {

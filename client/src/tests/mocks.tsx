@@ -7,6 +7,10 @@
 //  Internal dependencies
 import * as libFd from '../libraries/flightData.service';
 
+//  Homepage text
+export const homepage: string =
+  'We believe everyone deserves the thrill of exploration without breaking the bank.';
+
 //  Flight data mocks
 const tomorrow: number = Date.now() + 1000 * 3600 * 24;
 const weekFromTomorrow: number = tomorrow + 1000 * 3600 * 24 * 7;
