@@ -12,11 +12,11 @@
 import validator from 'validator';
 
 //  Internal dependencies
-import { errors } from '../middleware/errorHandler.js';
-import * as api from '../api/skyscanner.api.js';
-import * as libApi from '../libraries/skyscanner.api.js';
-import * as libFd from '../libraries/flightData.model.js';
-import { Airports, Currencies } from '../databases/flightData.database.js';
+import { errors } from '../middleware/errorHandler.ts';
+import * as api from '../api/skyscanner.api.ts';
+import * as libApi from '../libraries/skyscanner.api.ts';
+import * as libFd from '../libraries/flightData.model.ts';
+import { Airports, Currencies } from '../databases/flightData.database.ts';
 
 //  API constants (update if API changes)
 const CABIN_CLASS: string = 'CABIN_CLASS_ECONOMY';
@@ -99,8 +99,9 @@ export const postLocaleInfoRequest = async (
 
   //  Obtain data from API
   const dataIn: libApi.NearestCulture = await api.getNearestCulture(ipAddress);
-  if (!(dataIn instanceof Object))
+  if (typeof dataIn !== 'object')
     throw new errors.BadGateway('Data retrieved in unknown format.');
+  //  !(dataIn instanceOf Object) does not work in Jest...
   if (!Object.keys(dataIn).length)
     throw new errors.BadGateway('No data received from API.');
 
@@ -205,8 +206,9 @@ export const postCheapestFlightsRequest = async (
   requestBody: libFd.CheapestFlightsRequest
 ): Promise<libFd.CheapestFlights> => {
   //  Check inputs
-  if (!(requestBody instanceof Object))
+  if (typeof requestBody !== 'object')
     throw new errors.BadRequest('Incorrect user input.');
+  //  !(requestBody instanceOf Object) does not work in Jest...
   requestBody.lookAtWeeks = validator.toInt(requestBody.lookAtWeeks.toString());
   requestBody.travelDate = validator.toInt(requestBody.travelDate.toString());
   if (requestBody.returnDate) {
@@ -234,8 +236,9 @@ export const postCheapestFlightsRequest = async (
     //  Obtain data from API
     const dataIn: libApi.FlightsIndicative =
       await api.postFlightsIndicativeRequest(requestBodyApi);
-    if (!(dataIn instanceof Object))
+    if (typeof dataIn !== 'object')
       throw new errors.BadGateway('Data retrieved in unknown format.');
+    //  !(dataIn instanceOf Object) does not work in Jest...
     if (!Object.keys(dataIn).length)
       throw new errors.BadGateway('No data received from API.');
 
@@ -363,8 +366,9 @@ export const postFlightInfoRequest = async (
   requestBody: libFd.FlightInfoRequest
 ): Promise<libFd.FlightInfo> => {
   //  Check inputs
-  if (!(requestBody instanceof Object))
+  if (typeof requestBody !== 'object')
     throw new errors.BadRequest('Incorrect user input.');
+  //  !(requestBody instanceOf Object) does not work in Jest...
   requestBody.travelDate = validator.toInt(requestBody.travelDate.toString());
   if (requestBody.returnDate) {
     requestBody.returnDate = validator.toInt(requestBody.returnDate.toString());
@@ -386,8 +390,9 @@ export const postFlightInfoRequest = async (
   //  Obtain data from API
   const dataIn: libApi.FlightsLivePrices =
     await api.postFlightsLivePricesRequest(requestBodyApi);
-  if (!(dataIn instanceof Object))
+  if (typeof dataIn !== 'object')
     throw new errors.BadGateway('Data retrieved in unknown format.');
+  //  !(dataIn instanceOf Object) does not work in Jest...
   if (!Object.keys(dataIn).length)
     throw new errors.BadGateway('No data received from API.');
 

@@ -11,8 +11,8 @@
  */
 
 //  Internal dependencies
-import { errors } from '../middleware/errorHandler.js';
-import * as libApi from '../libraries/skyscanner.api.js';
+import { errors } from '../middleware/errorHandler.ts';
+import * as libApi from '../libraries/skyscanner.api.ts';
 
 //  Skyscanner API URL
 const BASE_URL: string = 'https://partners.api.skyscanner.net/apiservices/v3';

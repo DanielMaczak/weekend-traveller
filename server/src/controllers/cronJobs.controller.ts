@@ -10,8 +10,8 @@
 import { schedule, ScheduledTask } from 'node-cron';
 
 //  Internal dependencies
-import { loadCurrencies, loadAirports } from '../models/cronJobs.model.js';
-import { errorLogger, UnknownError } from '../middleware/errorHandler.js';
+import { loadCurrencies, loadAirports } from '../models/cronJobs.model.ts';
+import { errorLogger, UnknownError } from '../middleware/errorHandler.ts';
 
 //  Cron job schedules
 const FLIGHT_DATA_SCHEDULE = `0 0 12 * * *`;
@@ -21,18 +21,21 @@ const FLIGHT_DATA_SCHEDULE = `0 0 12 * * *`;
  * All jobs must be encapsulated in error catcher!
  */
 export const initCronJobs = async () => {
+  const dataUpdate = async () => {
+    try {
+      await loadCurrencies();
+      await loadAirports();
+      console.log('Cron job finished');
+    } catch (err) {
+      errorLogger(new UnknownError(<Error>err));
+    }
+  };
   const jobFlightDataUpdate: ScheduledTask = await schedule(
     FLIGHT_DATA_SCHEDULE,
-    async () => {
-      try {
-        await loadCurrencies();
-        await loadAirports();
-        console.log('Cron job finished');
-      } catch (err) {
-        errorLogger(new UnknownError(<Error>err));
-      }
-    }
+    dataUpdate
   );
-  jobFlightDataUpdate.start();
+  await jobFlightDataUpdate.start();
   console.log('Cron schedule initialized');
+  await dataUpdate();
+  console.log('Initial data update finished');
 };

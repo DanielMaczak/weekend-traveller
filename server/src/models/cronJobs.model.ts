@@ -10,10 +10,10 @@
 import { Optional } from 'sequelize';
 
 //  Internal dependencies
-import { errors } from '../middleware/errorHandler.js';
-import * as api from '../api/skyscanner.api.js';
-import * as libApi from '../libraries/skyscanner.api.js';
-import { Airports, Currencies } from '../databases/flightData.database.js';
+import { errors } from '../middleware/errorHandler.ts';
+import * as api from '../api/skyscanner.api.ts';
+import * as libApi from '../libraries/skyscanner.api.ts';
+import { Airports, Currencies } from '../databases/flightData.database.ts';
 
 //  API constants (update if API changes)
 const PLACE_TYPE_COUNTRY = 'PLACE_TYPE_COUNTRY';
@@ -29,8 +29,9 @@ const PLACE_TYPE_AIRPORTS = [
 export const loadCurrencies = async (): Promise<void> => {
   //  Obtain data from API
   const dataIn: libApi.Currencies = await api.getCurrencies();
-  if (!(dataIn instanceof Object))
+  if (typeof dataIn !== 'object')
     throw new errors.BadGateway('Data retrieved in unknown format.');
+  //  !(dataIn instanceOf Object) does not work in Jest...
 
   //  Process data to internal format
   const dataProc: { code: string }[] = [];
@@ -54,8 +55,9 @@ export const loadCurrencies = async (): Promise<void> => {
 export const loadAirports = async (): Promise<void> => {
   //  Obtain data from API
   const dataIn: libApi.GeoHierarchy = await api.getGeoHierarchy('en-US');
-  if (!(dataIn instanceof Object))
+  if (typeof dataIn !== 'object')
     throw new errors.BadGateway('Data retrieved in unknown format.');
+  //  !(dataIn instanceOf Object) does not work in Jest...
 
   //  Process data to internal format
   const dataProc: { id: string; name: string }[] = [];
